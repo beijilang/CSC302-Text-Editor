@@ -1,11 +1,32 @@
 # CSC302-Text-Editor
 
+## How to navigate this repo
+
+Please find our meeting notes and documentations within the Documentation directory
+
+## Getting set up
+
+### Installation 
+
+After clone this project, navigate to main folder and run
+
+``` sudo sh ./install.sh``` 
+
+### Build and Run 
+
+Navigate to [terminal-text-editor](https://github.com/beijilang/CSC302-Text-Editor/tree/main/terminal-text-editor) folder and run
+
+```sudo sh ./run.sh```
+
+
+
 ## Milestone 1:
-    - Understand the source code of termit and identify the dependencies required for this project (i.e. terminal-kit)
-    - Build the basic structure of the application, that includes:
-        * Design the class structure with tools like CRC cards
-        * Design/Create function headers for some of the essential features like render text, read/write
-              
+
+- Understand the source code of termit and identify the dependencies required for this project (i.e. terminal-kit)
+- Build the basic structure of the application, that includes:
+    * Design the class structure with tools like CRC cards
+    * Design/Create function headers for some of the essential features like render text, read/write
+
 ## Milestone 2:
   - Adding basic text editor features such as: 
       * Rendering Text
