@@ -8,9 +8,13 @@ Please find our meeting notes and documentations within the Documentation direct
 
 ### Installation 
 
-After clone this project, navigate to main folder and run
+For ubuntu users, run
 
-``` sudo sh ./install.sh``` 
+``` sudo sh ./install-linux.sh```
+
+For macOS users, run
+
+``` sudo sh ./install-macos.sh```
 
 ### Build and Run 
 
