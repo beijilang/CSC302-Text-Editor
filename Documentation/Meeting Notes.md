@@ -22,3 +22,13 @@
   - Clarified our confusion about the tech stack
   - Ensured we are fine with our workloads
 
+## Oct 4
+
+- Discussed project structure
+  - The text editor is a npm library that can init by another js program, allowing them to add their own features on top of our text editor
+  - Decided to go with the most simple approach, all methods would go into one file for now
+- Discussed how to implement undo and redo because every action should be record by those features
+  - Decided to use a linked list to store every action for now
+    - Pro: easy to implement
+    - Con: waste a lot of space and time
+  - Still looking for a new approach
