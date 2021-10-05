@@ -16,7 +16,13 @@ For macOS users, run
 
 ``` sudo sh ./install-macos.sh```
 
-### Build and Run 
+### Build 
+
+```sudo sh ./dependency.sh```
+
+
+
+###  Run 
 
 Navigate to [terminal-text-editor](https://github.com/beijilang/CSC302-Text-Editor/tree/main/terminal-text-editor) folder and run
 
