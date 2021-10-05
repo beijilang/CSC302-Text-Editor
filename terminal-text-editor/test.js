@@ -1,4 +1,4 @@
-var term = require( 'terminal-kit' ).terminal ;
+import TextEditor from "./index.js";
 
-term( 'This is a test!\n' ) ;
-
+const editor = new TextEditor();
+//editor.openfile("CSC302.txt", "r");

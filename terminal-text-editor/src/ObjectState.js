@@ -1,4 +1,4 @@
-import {assert} from './util'
+import {assert} from './util.js'
 
 class SnapShotLinkedListNode {
     constructor(textEditorCommandObject) {

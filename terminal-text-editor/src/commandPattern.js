@@ -50,5 +50,4 @@ class DeleteCommand {
 
 
 // Call export here
-module.exports.append_com = AppendCommand;
-module.exports.delete_com = DeleteCommand;
+export {AppendCommand, DeleteCommand};

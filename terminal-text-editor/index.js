@@ -1,18 +1,28 @@
-let allCommands = require("./commandPattern")
+import { create_Command } from './src/util.js';
+import termKit from 'terminal-kit';
+import * as fs from 'fs';
 
-let appendCommandClass = allCommands.append_com;
-let deleteCommandClass = allCommands.delete_com;
+class TextEditor {
+    constructor(input_parameter = {}) {
+        this.term = termKit.terminal;
 
-function create_Command(command_type) {
-    return new appendCommandClass();
+        this.screenBuffer = new termKit.ScreenBuffer({
+			dst: this.term,
+			height: this.term.height - 2,
+			y: 2
+		});
+
+		// this.textBuffer = new terminalKit.TextBuffer({
+		// 	dst: this.screenBuffer
+		// });
+		// this.textBuffer.setText('');
+    }
+
+    // Open a file using the library
+    openfile(file_name, open_mode) {
+
+    }
+
 }
 
-let x = create_Command("test");
-x.execute();
-
-
-
-var term = require( 'terminal-kit' ).terminal ;
-
-term( 'Hello world!\n' ) ;
-
+export default TextEditor;
