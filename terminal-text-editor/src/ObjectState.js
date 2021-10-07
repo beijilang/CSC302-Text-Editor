@@ -1,7 +1,7 @@
 import {assert} from './util.js'
 
 class SnapShotLinkedListNode {
-    constructor(textEditorCommandObject) {
+    constructor(textEditorCommandObject = NULL) {
         this.command_obj = textEditorCommandObject;
         this.next = NULL;
         this.previous = NULL;
@@ -64,4 +64,6 @@ class TextEditorStateManagementLinkList {
     }
 }
 
+
+export default {SnapShotLinkedListNode, TextEditorStateManagementLinkList};
 

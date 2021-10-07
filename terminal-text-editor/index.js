@@ -1,6 +1,7 @@
 import { create_Command } from './src/util.js';
 import termKit from 'terminal-kit';
 import * as fs from 'fs';
+import {SnapShotLinkedListNode, TextEditorStateManagementLinkList} from './src/ObjectState'
 
 class TextEditor {
     constructor(input_parameter = {}) {
@@ -11,47 +12,64 @@ class TextEditor {
 			height: this.term.height - 2,
 			y: 2
 		});
+
+		this.textBuffer = new termKit.TextBuffer({
+			dst: this.screenBuffer
+		})
     }
 
- //    terminate() {
-	// 	term.grabInput( false ) ;
-	// 	setTimeout( function() { process.exit() } , 100 ) ;
-	// }
-
-    // Open a file using the library
-    openfile(file_name, open_mode) {
-
-    }
-
-    start(){
-    	this.term.clear();
-    }
-
-    test(){
-    	this.term.bold.cyan( 'Type anything on the keyboard...\n' ) ;
+	// Init a blank terminal for write
+	init() {
+		this.term.clear();
 		this.term.green( 'Hit CTRL-C to quit.\n\n' ) ;
-
 		this.term.grabInput( { mouse: 'button' } ) ;
+		this.term.on( 'key' , ( name , matches , data ) => {
+			this.handle_key_press_event(name)
+		}) ;
+		let init_state = SnapShotLinkedListNode();
+		this.TextEditorStateManagementLinkList = TextEditorStateManagementLinkList(init_state);
+	}
 
-		this.term.on( 'key' , ( name ,matches, data ) => {
-			console.log( "'key' event:" , name ) ;
-			if ( name === 'CTRL_C' ) { terminate() ; }
-		} ) ;
 
-		this.term.on( 'terminal' , ( name , data ) => {
-			console.log( "'terminal' event:" , name , data ) ;
-		} ) ;
+	handle_key_press_event(name) {
+		switch(name) {
+			case " ":
+				this.move_cursor_to_right();
+				break;
+			case "BACKSPACE":
+				this.move_cursor_to_left();
+				break;
+			case "CTRL_C":
+				this.terminate();
+				break;
+			case "CTRL_Z":
+				this.redo();
+				break;
+		}
+	}
 
-		this.term.on( 'mouse' , ( name , data ) => {
-			console.log( "'mouse' event:" , name , data ) ;
-		} ) ;
+	redo() {
+
+	}
+
+	move_cursor_to_right() {
+		this.term.right(1);
+		this.term.getCursorLocation((error, x, y) => (console.log(x, y)));
+	}
+
+	move_cursor_to_left() {
+		this.term.left(1);
+	}
+
+
+    openfile(file_name, open_mode) {
+		
     }
 
     terminate() {
 		this.term.grabInput( false ) ;
 		setTimeout( function() { process.exit() } , 100 ) ;
 	}
-
 }
 
 export default TextEditor;

@@ -1,17 +1,3 @@
-class Command {
-    constructor() {
-
-    }
-
-    execute() {
-
-    }
-
-    redo() {
-        // What operation will be applied to add this change
-    }
-}
-
 // Initialize class that has the same structure as the above to make changes. For exmaple, when appending, should Init AppendCommand,
 // And initialize it with the append index and content;
 
@@ -27,6 +13,13 @@ class AppendCommand {
     redo() {
         // Call it to undo the executed change
     }
+}
+
+class SpaceCommand {
+    constructor(terminal_obj) {
+
+    }
+
 }
 
 class DeleteCommand {

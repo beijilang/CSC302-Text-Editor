@@ -45,8 +45,7 @@ var term = termKit.terminal ;
 import TextEditor from "./index.js";
 
 const editor = new TextEditor();
-editor.start();
-editor.test();
+editor.init();
 
 
 // function terminate() {
