@@ -19,12 +19,12 @@ class SpaceCommand {
     constructor() {
 
     }
-    execute() {
-        this.term.right(1);
+    execute(TextEdtiroObj) {
+        TextEdtiroObj.term.right(1);
     }
 
-    redo() {
-        this.term.left(1);
+    redo(TextEdtiroObj) {
+        TextEdtiroObj.term.left(1);
     }
 
 }

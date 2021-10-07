@@ -52,16 +52,16 @@ class TextEditor {
 	}
 
 	undo_command() {
-		this.TextEditorStateManagementLinkList.get_cur_node().command_obj.redo.bind(this)()
+		this.TextEditorStateManagementLinkList.get_cur_node().command_obj.redo(this)
 	}
 
 	redo_command() {
-		this.TextEditorStateManagementLinkList.get_cur_node().command_obj.execute.bind(this)()
+		this.TextEditorStateManagementLinkList.get_cur_node().command_obj.execute(this)
 	}
 
 	insert_and_execute(insert_node) {
 		this.TextEditorStateManagementLinkList.insertNewState(insert_node);
-		insert_node.command_obj.execute.bind(this)();
+		insert_node.command_obj.execute(this);
 	}
 
 	undo() {
