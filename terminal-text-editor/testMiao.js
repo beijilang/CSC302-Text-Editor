@@ -48,6 +48,7 @@ const editor = new TextEditor();
 editor.init();
 
 
+
 // function terminate() {
 // 	term.grabInput( false ) ;
 // 	setTimeout( function() { process.exit() } , 100 ) ;

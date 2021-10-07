@@ -32,3 +32,17 @@
     - Pro: easy to implement
     - Con: waste a lot of space and time
   - Still looking for a new approach
+
+## Oct 6
+
+- Re-designed on the undo and redo
+  - Using Command Pattern to store every action
+- Re-arranged milestones
+  - We had to implement redo and undo feature for every other features, so it can't be an individual milestone
+
+
+
+
+
+
+

@@ -9,9 +9,10 @@ class SnapShotLinkedListNode {
 }
 
 class TextEditorStateManagementLinkList {
-    constructor(textEditorSnapShotObjectHead) {
+    constructor(textEditorSnapShotObjectHead, textEditor) {
         // Empty Text Editor, Should Init with empty
         this.cur_node = textEditorSnapShotObjectHead;
+        this.textEditor = textEditor;
     }
 
     error_check() {

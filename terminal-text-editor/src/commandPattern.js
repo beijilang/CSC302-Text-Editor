@@ -3,8 +3,8 @@
 
 class AppendCommand {
     constructor(append_index, append_content) {
-        this.append_index = append_index;
-        this.append_content = append_content;
+        this.textEditor.append_index = append_index;
+        this.textEditor.append_content = append_content;
     }
     execute() {
         // Call Execute to make changes
@@ -29,10 +29,37 @@ class SpaceCommand {
 
 }
 
+class TextCommand {
+    constructor(text) {
+        // console.log(text);
+        this.text = text;
+        // console.log(this.text);
+    }
+    execute(TextEdtiroObj) {
+
+        TextEdtiroObj.textBuffer.insert(this.text);
+        TextEdtiroObj.textBuffer.draw();
+        TextEdtiroObj.screenBuffer.draw({
+            delta: true
+        });
+
+    }
+
+    redo(TextEdtiroObj) {
+        // console.log(TextEdtiroObj.textBuffer)
+        TextEdtiroObj.textBuffer.backDelete(1);
+        TextEdtiroObj.textBuffer.draw();
+        TextEdtiroObj.screenBuffer.draw({
+            delta: true
+        });
+    } 
+
+}
+
 class DeleteCommand {
     constructor(delete_index, delete_num) {
-        this.delete_index = delete_index;
-        this.delete_num = delete_num;
+        this.textEditor.delete_index = delete_index;
+        this.textEditor.delete_num = delete_num;
     }
 
     execute() {
@@ -50,4 +77,4 @@ class DeleteCommand {
 
 
 // Call export here
-export {AppendCommand, DeleteCommand, SpaceCommand};
+export {AppendCommand, DeleteCommand, SpaceCommand, TextCommand};

@@ -27,7 +27,7 @@ class TextEditor {
 			this.handle_key_press_event(name)
 		}) ;
 		let init_state = new SnapShotLinkedListNode();
-		this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state);
+		this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state,this);
 	}
 
 
@@ -48,6 +48,8 @@ class TextEditor {
 			case "CTRL_Y":
 				this.redo();
 				break;
+			default:
+				this.new_char(name);
 		}
 	}
 
@@ -86,6 +88,12 @@ class TextEditor {
 
 	move_cursor_to_right() {
 		let appendCommand = create_Command({"command_type": "space"});
+		let node = new SnapShotLinkedListNode(appendCommand);
+		this.insert_and_execute(node);		
+	}
+
+	new_char(char) {
+		let appendCommand = create_Command({"command_type": "text","text":char});
 		let node = new SnapShotLinkedListNode(appendCommand);
 		this.insert_and_execute(node);		
 	}
