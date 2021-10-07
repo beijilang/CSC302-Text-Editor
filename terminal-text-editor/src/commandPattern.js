@@ -38,20 +38,16 @@ class TextCommand {
     execute(TextEdtiroObj) {
 
         TextEdtiroObj.textBuffer.insert(this.text);
-        TextEdtiroObj.textBuffer.draw();
-        TextEdtiroObj.screenBuffer.draw({
-            delta: true
-        });
+        
 
     }
 
     redo(TextEdtiroObj) {
         // console.log(TextEdtiroObj.textBuffer)
         TextEdtiroObj.textBuffer.backDelete(1);
-        TextEdtiroObj.textBuffer.draw();
-        TextEdtiroObj.screenBuffer.draw({
-            delta: true
-        });
+        TextEdtiroObj.term.move(-1,0);
+        
+        
     } 
 
 }

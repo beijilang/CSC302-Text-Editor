@@ -24,14 +24,14 @@ class TextEditor {
 		this.term.green( 'Hit CTRL-C to quit.\n\n' ) ;
 		this.term.grabInput( { mouse: 'button' } ) ;
 		this.term.on( 'key' , ( name , matches , data ) => {
-			this.handle_key_press_event(name)
+			this.handle_key_press_event(name,data)
 		}) ;
 		let init_state = new SnapShotLinkedListNode();
 		this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state,this);
 	}
 
 
-	handle_key_press_event(name) {
+	handle_key_press_event(name, data) {
 		switch(name) {
 			case " ":
 				this.move_cursor_to_right();
@@ -48,9 +48,25 @@ class TextEditor {
 			case "CTRL_Y":
 				this.redo();
 				break;
+			case 'ENTER':
+				this.textBuffer.newLine();
+				break;
+
+			case 'TAB':
+				this.new_char('\t');
+				break;
+			case 'HOME':
+				this.textBuffer.moveToColumn(0);
+				break;
+			case 'END':
+				this.textBuffer.moveToEndOfLine();
+				break;
 			default:
-				this.new_char(name);
+				if (data.isCharacter) {
+					this.new_char(name);
+				}
 		}
+		this.draw();
 	}
 
 	undo_command() {
@@ -102,7 +118,16 @@ class TextEditor {
 		
     }
 
+    draw(){
+    	this.textBuffer.draw();
+        this.screenBuffer.draw({
+            delta: true
+        });
+    }
+
     terminate() {
+    	this.term.clear();
+    	this.term.moveTo(0,0);
 		this.term.grabInput( false ) ;
 		setTimeout( function() { process.exit() } , 100 ) ;
 	}

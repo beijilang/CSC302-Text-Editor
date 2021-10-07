@@ -44,5 +44,9 @@
 
 
 
+## Oct 7
 
-
+- Meeting with the TA
+  - Went over our A1 contribution
+  - Discuss about our next step, we need to re-arrange our milestone
+- Realized cursor position is a problem, sometimes it's not in the correct position
