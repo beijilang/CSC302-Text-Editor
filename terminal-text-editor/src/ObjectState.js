@@ -1,10 +1,10 @@
 import {assert} from './util.js'
 
 class SnapShotLinkedListNode {
-    constructor(textEditorCommandObject = NULL) {
+    constructor(textEditorCommandObject = null) {
         this.command_obj = textEditorCommandObject;
-        this.next = NULL;
-        this.previous = NULL;
+        this.next = null;
+        this.previous = null;
     }
 }
 
@@ -15,17 +15,17 @@ class TextEditorStateManagementLinkList {
     }
 
     error_check() {
-        if (this.cur_node == NULL) {
+        if (this.cur_node == null) {
             assert(false, "TAIL AND HEAD EMPTY")
         }
     }
 
     // Text editor update, initialze a new state
     insertNewState(textEditorSnapShotNode) {
-        error_check();
+        this.error_check();
         this.cur_node.next = textEditorSnapShotNode;
+        textEditorSnapShotNode.previous = this.cur_node;
         this.cur_node = this.cur_node.next;
-        this.cur_node.execute();
     }
 
     get_cur_node() {
@@ -37,14 +37,8 @@ class TextEditorStateManagementLinkList {
         return this.cur_node.previous;
     }
 
-    undo_action() {
-        if (this.cur_node.previous = NULL) {
-            assert(false, "Can not UNDO, previous state is empty");
-        }
-        else {
-            this.cur_node.command_obj.undo();
-            this.cur_node = this.cur_node.previous;
-        }
+    move_cur_node_to_left() {
+        this.cur_node = this.cur_node.previous;
     }
 
     // Return the next Node, should dcall this before applying undo, if returns NULL, meaning this is the most recent change
@@ -54,7 +48,7 @@ class TextEditorStateManagementLinkList {
 
     // Apply the redo Action.
     redo_action() {
-        if (this.cur_node.next == NULL) {
+        if (this.cur_node.next == null) {
             assert(false, "Can not REDO, next state is EMPTY");
         }
         else{
@@ -65,5 +59,5 @@ class TextEditorStateManagementLinkList {
 }
 
 
-export default {SnapShotLinkedListNode, TextEditorStateManagementLinkList};
+export {SnapShotLinkedListNode, TextEditorStateManagementLinkList};
 

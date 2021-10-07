@@ -16,8 +16,15 @@ class AppendCommand {
 }
 
 class SpaceCommand {
-    constructor(terminal_obj) {
+    constructor() {
 
+    }
+    execute() {
+        this.term.right(1);
+    }
+
+    redo() {
+        this.term.left(1);
     }
 
 }
@@ -43,4 +50,4 @@ class DeleteCommand {
 
 
 // Call export here
-export {AppendCommand, DeleteCommand};
+export {AppendCommand, DeleteCommand, SpaceCommand};

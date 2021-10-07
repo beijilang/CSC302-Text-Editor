@@ -1,7 +1,7 @@
 import { create_Command } from './src/util.js';
 import termKit from 'terminal-kit';
 import * as fs from 'fs';
-import {SnapShotLinkedListNode, TextEditorStateManagementLinkList} from './src/ObjectState'
+import {SnapShotLinkedListNode, TextEditorStateManagementLinkList} from './src/ObjectState.js'
 
 class TextEditor {
     constructor(input_parameter = {}) {
@@ -26,8 +26,8 @@ class TextEditor {
 		this.term.on( 'key' , ( name , matches , data ) => {
 			this.handle_key_press_event(name)
 		}) ;
-		let init_state = SnapShotLinkedListNode();
-		this.TextEditorStateManagementLinkList = TextEditorStateManagementLinkList(init_state);
+		let init_state = new SnapShotLinkedListNode();
+		this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state);
 	}
 
 
@@ -43,24 +43,35 @@ class TextEditor {
 				this.terminate();
 				break;
 			case "CTRL_Z":
-				this.redo();
+				this.undo();
 				break;
 		}
 	}
 
-	redo() {
+	undo_command() {
+		this.TextEditorStateManagementLinkList.get_cur_node().command_obj.redo.bind(this)()
+	}
 
+	insert_and_execute(insert_node) {
+		this.TextEditorStateManagementLinkList.insertNewState(insert_node);
+		insert_node.command_obj.execute.bind(this)();
+	}
+
+	undo() {
+		let prev_state = this.TextEditorStateManagementLinkList.get_last_action();
+		if (prev_state == null) {
+			console.log("Can no longer UNDO");
+			return;
+		}
+		this.undo_command();
+		this.TextEditorStateManagementLinkList.move_cur_node_to_left();
 	}
 
 	move_cursor_to_right() {
-		this.term.right(1);
-		this.term.getCursorLocation((error, x, y) => (console.log(x, y)));
+		let appendCommand = create_Command({"command_type": "space"});
+		let node = new SnapShotLinkedListNode(appendCommand);
+		this.insert_and_execute(node);		
 	}
-
-	move_cursor_to_left() {
-		this.term.left(1);
-	}
-
 
     openfile(file_name, open_mode) {
 		
