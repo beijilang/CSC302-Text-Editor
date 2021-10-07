@@ -18,10 +18,44 @@ class TextEditor {
 		// this.textBuffer.setText('');
     }
 
+ //    terminate() {
+	// 	term.grabInput( false ) ;
+	// 	setTimeout( function() { process.exit() } , 100 ) ;
+	// }
+
     // Open a file using the library
     openfile(file_name, open_mode) {
 
     }
+
+    start(){
+    	this.term.clear();
+    }
+
+    test(){
+    	this.term.bold.cyan( 'Type anything on the keyboard...\n' ) ;
+		this.term.green( 'Hit CTRL-C to quit.\n\n' ) ;
+
+		this.term.grabInput( { mouse: 'button' } ) ;
+
+		this.term.on( 'terminal' , ( name ,matches, data ) => {
+			console.log( "'key' event:" , name ) ;
+			if ( name === 'CTRL_C' ) { terminate() ; }
+		} ) ;
+
+		this.term.on( 'terminal' , function( name , data ) {
+			console.log( "'terminal' event:" , name , data ) ;
+		} ) ;
+
+		this.term.on( 'mouse' , function( name , data ) {
+			console.log( "'mouse' event:" , name , data ) ;
+		} ) ;
+    }
+
+    terminate() {
+		term.grabInput( false ) ;
+		setTimeout( function() { process.exit() } , 100 ) ;
+	}
 
 }
 
