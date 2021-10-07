@@ -45,11 +45,18 @@ class TextEditor {
 			case "CTRL_Z":
 				this.undo();
 				break;
+			case "CTRL_Y":
+				this.redo();
+				break;
 		}
 	}
 
 	undo_command() {
 		this.TextEditorStateManagementLinkList.get_cur_node().command_obj.redo.bind(this)()
+	}
+
+	redo_command() {
+		this.TextEditorStateManagementLinkList.get_cur_node().command_obj.execute.bind(this)()
 	}
 
 	insert_and_execute(insert_node) {
@@ -65,6 +72,16 @@ class TextEditor {
 		}
 		this.undo_command();
 		this.TextEditorStateManagementLinkList.move_cur_node_to_left();
+	}
+	
+	redo() {
+		let next_state = this.TextEditorStateManagementLinkList.get_next_action();
+		if (next_state == null) {
+			console.log("Can not redo");
+			return;
+		}
+		this.TextEditorStateManagementLinkList.move_cursor_to_right();
+		this.redo_command()
 	}
 
 	move_cursor_to_right() {

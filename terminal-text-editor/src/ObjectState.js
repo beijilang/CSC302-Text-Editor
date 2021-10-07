@@ -38,7 +38,17 @@ class TextEditorStateManagementLinkList {
     }
 
     move_cur_node_to_left() {
+        if (this.cur_node.previous == null) {
+            assert(false, "prev is null");
+        }
         this.cur_node = this.cur_node.previous;
+    }
+
+    move_cursor_to_right() {
+        if (this.cur_node.next == null) {
+            assert(false, "next is null");
+        }
+        this.cur_node = this.cur_node.next;
     }
 
     // Return the next Node, should dcall this before applying undo, if returns NULL, meaning this is the most recent change
@@ -47,15 +57,6 @@ class TextEditorStateManagementLinkList {
     }
 
     // Apply the redo Action.
-    redo_action() {
-        if (this.cur_node.next == null) {
-            assert(false, "Can not REDO, next state is EMPTY");
-        }
-        else{
-            this.cur_node.next.command_obj.execute();
-            this.cur_node = this.cur_node.next;
-        }
-    }
 }
 
 
