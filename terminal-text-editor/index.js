@@ -11,11 +11,6 @@ class TextEditor {
 			height: this.term.height - 2,
 			y: 2
 		});
-
-		// this.textBuffer = new terminalKit.TextBuffer({
-		// 	dst: this.screenBuffer
-		// });
-		// this.textBuffer.setText('');
     }
 
  //    terminate() {
@@ -36,12 +31,12 @@ class TextEditor {
     	this.term.bold.cyan( 'Type anything on the keyboard...\n' ) ;
 		this.term.green( 'Hit CTRL-C to quit.\n\n' ) ;
 
-		this.term.grabInput( { mouse: 'button' } ) ;
+		this.term.grabInput( { mouse: 'button'} ) ;
 
-		this.term.on( 'terminal' , ( name ,matches, data ) => {
+		this.term.on( 'key' , function( name , matches , data ) {
 			console.log( "'key' event:" , name ) ;
-			if ( name === 'CTRL_C' ) { terminate() ; }
-		} ) ;
+			if ( name === 'CTRL_C' ) { this.terminate() ; }
+		}.bind(this) ) ;
 
 		this.term.on( 'terminal' , function( name , data ) {
 			console.log( "'terminal' event:" , name , data ) ;
@@ -53,7 +48,7 @@ class TextEditor {
     }
 
     terminate() {
-		term.grabInput( false ) ;
+		this.term.grabInput( false ) ;
 		setTimeout( function() { process.exit() } , 100 ) ;
 	}
 
