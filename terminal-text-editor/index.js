@@ -31,18 +31,18 @@ class TextEditor {
     	this.term.bold.cyan( 'Type anything on the keyboard...\n' ) ;
 		this.term.green( 'Hit CTRL-C to quit.\n\n' ) ;
 
-		this.term.grabInput( { mouse: 'button'} ) ;
+		this.term.grabInput( { mouse: 'button' } ) ;
 
-		this.term.on( 'key' , function( name , matches , data ) {
+		this.term.on( 'key' , ( name ,matches, data ) => {
 			console.log( "'key' event:" , name ) ;
-			if ( name === 'CTRL_C' ) { this.terminate() ; }
-		}.bind(this) ) ;
+			if ( name === 'CTRL_C' ) { terminate() ; }
+		} ) ;
 
-		this.term.on( 'terminal' , function( name , data ) {
+		this.term.on( 'terminal' , ( name , data ) => {
 			console.log( "'terminal' event:" , name , data ) ;
 		} ) ;
 
-		this.term.on( 'mouse' , function( name , data ) {
+		this.term.on( 'mouse' , ( name , data ) => {
 			console.log( "'mouse' event:" , name , data ) ;
 		} ) ;
     }
