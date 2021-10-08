@@ -43,7 +43,6 @@ class TextCommand {
 
     redo(TextEdtiorObj) {
         TextEdtiorObj.textBuffer.backDelete(1);
-        TextEdtiorObj.term.move(-1,0);
         TextEdtiorObj.draw_cursor();
         TextEdtiorObj.draw();
     } 

@@ -55,8 +55,10 @@ class TextEditor {
 				this.move_cursor_to_right();
 				break;
 			case "BACKSPACE":
-				this.move_cursor_to_left();
-				break;
+				// this.move_cursor_to_left();
+				// break;
+                this.display_terminal_text_content();
+                break;
 			case "CTRL_C":
 				this.terminate();
 				break;
@@ -86,6 +88,10 @@ class TextEditor {
                 break;
 		}
 	}
+
+    display_terminal_text_content() {
+        console.log("The text is ", this.textBuffer.getText());
+    }
 
 	undo_command() {
 		this.TextEditorStateManagementLinkList.get_cur_node().command_obj.redo(this)
