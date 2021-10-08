@@ -19,12 +19,12 @@ class SpaceCommand {
     constructor() {
 
     }
-    execute(TextEdtiroObj) {
-        TextEdtiroObj.term.right(1);
+    execute(TextEdtiorObj) {
+        TextEdtiorObj.term.right(1);
     }
 
-    redo(TextEdtiroObj) {
-        TextEdtiroObj.term.left(1);
+    redo(TextEdtiorObj) {
+        TextEdtiorObj.term.left(1);
     }
 
 }
@@ -35,19 +35,17 @@ class TextCommand {
         this.text = text;
         // console.log(this.text);
     }
-    execute(TextEdtiroObj) {
+    execute(TextEdtiorObj) {
 
-        TextEdtiroObj.textBuffer.insert(this.text);
-        
-
+        TextEdtiorObj.textBuffer.insert(this.text);
+        TextEdtiorObj.draw();
     }
 
-    redo(TextEdtiroObj) {
-        // console.log(TextEdtiroObj.textBuffer)
-        TextEdtiroObj.textBuffer.backDelete(1);
-        TextEdtiroObj.term.move(-1,0);
-        
-        
+    redo(TextEdtiorObj) {
+        TextEdtiorObj.textBuffer.backDelete(1);
+        TextEdtiorObj.term.move(-1,0);
+        TextEdtiorObj.draw_cursor();
+        TextEdtiorObj.draw();
     } 
 
 }

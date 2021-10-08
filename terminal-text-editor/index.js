@@ -18,17 +18,35 @@ class TextEditor {
 		})
     }
 
+    draw_cursor() {
+		this.textBuffer.draw();
+		this.screenBuffer.draw({
+			delta: true
+		});
+		this.textBuffer.drawCursor();
+		this.screenBuffer.drawCursor();
+    }
+
 	// Init a blank terminal for write
 	init() {
-		this.term.clear();
+        this.term.clear();
 		this.term.green( 'Hit CTRL-C to quit.\n\n' ) ;
 		this.term.grabInput( { mouse: 'button' } ) ;
 		this.term.on( 'key' , ( name , matches , data ) => {
 			this.handle_key_press_event(name,data)
 		}) ;
+        this.textBuffer.moveTo(0,0);
+        this.screenBuffer.moveTo(0,0);
+        this.draw_cursor();
 		let init_state = new SnapShotLinkedListNode();
 		this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state,this);
+        this.draw();
+
 	}
+
+    log_cur_location() {
+        this.term.getCursorLocation((err, x, y) => console.log(x, y));
+    }
 
 
 	handle_key_press_event(name, data) {
@@ -48,25 +66,25 @@ class TextEditor {
 			case "CTRL_Y":
 				this.redo();
 				break;
-			case 'ENTER':
-				this.textBuffer.newLine();
-				break;
+			// case 'ENTER':
+			// 	this.textBuffer.newLine();
+			// 	break;
 
-			case 'TAB':
-				this.new_char('\t');
-				break;
-			case 'HOME':
-				this.textBuffer.moveToColumn(0);
-				break;
-			case 'END':
-				this.textBuffer.moveToEndOfLine();
-				break;
+			// case 'TAB':
+			// 	this.new_char('\t');    
+			// 	break;
+			// case 'HOME':
+			// 	this.textBuffer.moveToColumn(0);
+			// 	break;
+			// case 'END':
+			// 	this.textBuffer.moveToEndOfLine();
+			// 	break;
 			default:
 				if (data.isCharacter) {
 					this.new_char(name);
 				}
+                break;
 		}
-		this.draw();
 	}
 
 	undo_command() {
