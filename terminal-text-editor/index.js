@@ -7,12 +7,16 @@ function create_Command(command_type) {
     return new appendCommandClass();
 }
 
-let x = create_Command("test");
-x.execute();
-
-
-
 var term = require( 'terminal-kit' ).terminal ;
 
 term( 'Hello world!\n' ) ;
+
+
+
+
+
+
+
+
+
 
