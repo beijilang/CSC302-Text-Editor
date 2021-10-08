@@ -1,5 +1,6 @@
 {
   "name": "302",
+  "type": "module",
   "version": "1.0.0",
   "description": "Javascript Text Editor",
   "main": "index.js",
