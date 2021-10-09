@@ -1,14 +1,13 @@
 {
-  "name": "302",
+  "name": "csc302-text-editor",
   "type": "module",
-  "version": "1.0.0",
-  "description": "Javascript Text Editor",
-  "main": "index.js",
+  "version": "0.0.1",
+  "description": "A text editor",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src",
+    "test": "node test/test.js"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "terminal-kit": "^2.1.6"
   }

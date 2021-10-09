@@ -1,7 +1,7 @@
-import { create_Command } from './src/util.js';
+import { create_Command } from './util.js';
 import termKit from 'terminal-kit';
 import * as fs from 'fs';
-import {SnapShotLinkedListNode, TextEditorStateManagementLinkList} from './src/ObjectState.js'
+import {SnapShotLinkedListNode, TextEditorStateManagementLinkList} from './ObjectState.js'
 
 class TextEditor {
     constructor(input_parameter = {}) {
@@ -104,7 +104,7 @@ class TextEditor {
 			// 	break;
 
 			// case 'TAB':
-			// 	this.new_char('\t');    
+			// 	this.new_char('\t');
 			// 	break;
 			// case 'HOME':
 			// 	this.textBuffer.moveToColumn(0);
@@ -146,7 +146,7 @@ class TextEditor {
 		this.undo_command();
 		this.TextEditorStateManagementLinkList.move_cur_node_to_left();
 	}
-	
+
 	redo() {
 		let next_state = this.TextEditorStateManagementLinkList.get_next_action();
 		if (next_state == null) {
@@ -160,13 +160,13 @@ class TextEditor {
 	move_cursor_to_right() {
 		let appendCommand = create_Command({"command_type": "space"});
 		let node = new SnapShotLinkedListNode(appendCommand);
-		this.insert_and_execute(node);		
+		this.insert_and_execute(node);
 	}
 
 	new_char(char) {
 		let appendCommand = create_Command({"command_type": "text","text":char});
 		let node = new SnapShotLinkedListNode(appendCommand);
-		this.insert_and_execute(node);		
+		this.insert_and_execute(node);
 	}
 
     draw(){
