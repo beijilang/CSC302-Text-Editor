@@ -28,7 +28,7 @@ class TextEditor {
     }
 
 	// Init a blank terminal for write
-	init() {
+	init(file) {
         this.term.clear();
 		this.term.green( 'Hit CTRL-C to quit.\n\n' ) ;
 		this.term.grabInput( { mouse: 'button' } ) ;
@@ -38,10 +38,38 @@ class TextEditor {
         this.textBuffer.moveTo(0,0);
         this.screenBuffer.moveTo(0,0);
         this.draw_cursor();
+		this.file = file;
+		this.load_file(file)
 		let init_state = new SnapShotLinkedListNode();
 		this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state,this);
         this.draw();
 
+	}
+
+	load_file(file, encoding='utf8', mode="w"){
+		try{
+			let text = fs.readFileSync(file, encoding, mode);
+			this.textBuffer.insert(text);
+		}
+		catch(e){
+			//TODO: Add error check
+			this.term.red("something went wrong");
+		}
+	}
+
+	save_file(){
+		try{
+			fs.writeFileSync(this.file, this.textBuffer.getText());
+			this.term.green("\nFile Saved!");
+		}
+		catch(e){
+			//TODO:: Add error check
+			this.term.red("Something went wrong");
+		}
+	}
+
+	// This is just a temp method for logging out something went wrong.
+	warning_tmp(){
 	}
 
     log_cur_location() {
@@ -59,6 +87,9 @@ class TextEditor {
 				// break;
                 this.display_terminal_text_content();
                 break;
+			case "CTRL_S":
+				if(this.file != null){this.save_file();}
+				break;
 			case "CTRL_C":
 				this.terminate();
 				break;
@@ -137,10 +168,6 @@ class TextEditor {
 		let node = new SnapShotLinkedListNode(appendCommand);
 		this.insert_and_execute(node);		
 	}
-
-    openfile(file_name, open_mode) {
-		
-    }
 
     draw(){
     	this.textBuffer.draw();
