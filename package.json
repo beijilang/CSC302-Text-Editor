@@ -1,0 +1,14 @@
+{
+  "name": "csc302-text-editor",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "A text editor",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src",
+    "test": "node test/test.js"
+  },
+  "dependencies": {
+    "terminal-kit": "^2.1.6"
+  }
+}

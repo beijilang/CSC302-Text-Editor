@@ -1,4 +1,4 @@
-### CS Boy's Meeting Notes
+# CS Boys Meeting Notes
 
 ## Sept 23 - 24
 
@@ -14,9 +14,9 @@
 - Start work on Assignment 1
   - Took a look at the given repository
   - Discussed the required feature that we need to implement
-  - Discussed the four milestones  
+  - Discussed the four milestones
 
-## Sept 30 
+## Sept 30
 
 - Office Hour with TA
   - Clarified our confusion about the tech stack

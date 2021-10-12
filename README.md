@@ -1,29 +1,25 @@
 # CSC302-Text-Editor
 
-## How to navigate this repo
+Meeting notes and the development plan are in [`docs/`](https://github.com/beijilang/CSC302-Text-Editor/tree/main/docs)
 
-Please find our meeting notes and documentations within the Documentation directory
+## Initial set up
 
-## Getting set up
+Install the [Node.js LTS](https://nodejs.org/en/download/) (14 as of writing) for your operating system.
 
-### Installation 
+## Installing dependencies
 
-For ubuntu users, run
+```bash
+npm install
+```
 
-``` sudo sh ./install-linux.sh```
+## Starting the editor
 
-For macOS users, run
+```bash
+npm start
+```
 
-``` sudo sh ./install-macos.sh```
+## Running tests
 
-### Build 
-
-```sudo sh ./dependency.sh```
-
-
-
-###  Run 
-
-Navigate to [terminal-text-editor](https://github.com/beijilang/CSC302-Text-Editor/tree/main/terminal-text-editor) folder and run
-
-```sudo sh ./run.sh```
+```bash
+npm test
+```
