@@ -36,15 +36,23 @@ class TextCommand {
         // console.log(this.text);
     }
     execute(TextEdtiorObj) {
-
+        TextEdtiorObj.term.getCursorLocation((error, x, y)=>{
+            this.pos_x = x;
+            this.pos_y = y-2;
+        });
+        
         TextEdtiorObj.textBuffer.insert(this.text);
-        TextEdtiorObj.draw();
+        
+        
     }
 
     redo(TextEdtiorObj) {
+        // console.log(this);
+        TextEdtiorObj.textBuffer.moveTo(this.pos_x, this.pos_y);
         TextEdtiorObj.textBuffer.backDelete(1);
-        TextEdtiorObj.draw_cursor();
-        TextEdtiorObj.draw();
+
+        
+        
     } 
 
 }

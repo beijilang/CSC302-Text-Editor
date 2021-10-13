@@ -42,7 +42,6 @@ class TextEditor {
 		this.load_file(file)
 		let init_state = new SnapShotLinkedListNode();
 		this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state,this);
-        this.draw();
 
 	}
 
@@ -53,7 +52,7 @@ class TextEditor {
 		}
 		catch(e){
 			//TODO: Add error check
-			this.term.red("something went wrong");
+			// this.term.red("something went wrong");
 		}
 	}
 
@@ -64,7 +63,7 @@ class TextEditor {
 		}
 		catch(e){
 			//TODO:: Add error check
-			this.term.red("Something went wrong");
+			// this.term.red("Something went wrong");
 		}
 	}
 
@@ -82,10 +81,10 @@ class TextEditor {
 			case " ":
 				this.move_cursor_to_right();
 				break;
-			case "BACKSPACE":
+			// case "BACKSPACE":
 				// this.move_cursor_to_left();
 				// break;
-                this.display_terminal_text_content();
+                // this.display_terminal_text_content();
                 break;
 			case "CTRL_S":
 				if(this.file != null){this.save_file();}
@@ -99,29 +98,51 @@ class TextEditor {
 			case "CTRL_Y":
 				this.redo();
 				break;
-			// case 'ENTER':
-			// 	this.textBuffer.newLine();
-			// 	break;
+			case 'ENTER':
+				this.new_char('\n');
+				break;
 
-			// case 'TAB':
-			// 	this.new_char('\t');
-			// 	break;
-			// case 'HOME':
-			// 	this.textBuffer.moveToColumn(0);
-			// 	break;
-			// case 'END':
-			// 	this.textBuffer.moveToEndOfLine();
-			// 	break;
+			case 'TAB':
+				this.new_char('\t');
+				break;
+			case 'HOME':
+				this.textBuffer.moveToColumn(0);
+				
+				break;
+			case 'END':
+				this.textBuffer.moveToEndOfLine();
+				break;
+
+			case 'UP':
+				this.textBuffer.moveUp();
+				if (typeof this.textBuffer.buffer[this.textBuffer.cy] !== 'undefined' && this.textBuffer.cx > this.textBuffer.buffer[this.textBuffer.cy].length - 1) {
+					this.textBuffer.moveToEndOfLine();
+				}
+				break;
+			case 'DOWN':
+				this.textBuffer.moveDown();
+	
+				if (typeof this.textBuffer.buffer[this.textBuffer.cy] !== 'undefined' && this.textBuffer.cx > this.textBuffer.buffer[this.textBuffer.cy].length - 1) {
+					this.textBuffer.moveToEndOfLine();
+				}
+				break;
+				
+			case 'LEFT':
+				this.textBuffer.moveBackward();
+			case 'RIGHT':
+				
+				this.textBuffer.moveRight();
 			default:
 				if (data.isCharacter) {
 					this.new_char(name);
 				}
                 break;
 		}
+		this.draw_cursor();
 	}
 
     display_terminal_text_content() {
-        console.log("The text is ", this.textBuffer.getText());
+        // console.log("The text is ", this.textBuffer.getText());
     }
 
 	undo_command() {
@@ -169,12 +190,7 @@ class TextEditor {
 		this.insert_and_execute(node);
 	}
 
-    draw(){
-    	this.textBuffer.draw();
-        this.screenBuffer.draw({
-            delta: true
-        });
-    }
+   
 
     terminate() {
     	this.term.clear();

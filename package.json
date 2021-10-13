@@ -9,6 +9,6 @@
     "test": "node test/test.js"
   },
   "dependencies": {
-    "terminal-kit": "^2.1.6"
+    "terminal-kit": "^2.1.8"
   }
 }

@@ -1,5 +1,5 @@
-import termKit from 'terminal-kit';
-var term = termKit.terminal;
+// import termKit from 'terminal-kit';
+// var term = termKit.terminal;
 
 import TextEditor from "../src/TextEditor.js";
 
