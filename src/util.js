@@ -8,8 +8,12 @@ export function create_Command(command_obj) {
         return new SpaceCommand();
     }
     if (command_obj.command_type == "text") {
-        return new TextCommand(command_obj.text);
+        return new TextCommand(command_obj.text, command_obj.x, command_obj.y);
     }
+    if (command_obj.command_type == "delete") {
+        return new DeleteCommand(command_obj.x, command_obj.y);
+    }
+
 }
 
 export function assert(condition, message) {

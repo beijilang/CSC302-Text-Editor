@@ -23,6 +23,7 @@ class TextEditor {
 		this.screenBuffer.draw({
 			delta: true
 		});
+		
 		this.textBuffer.drawCursor();
 		this.screenBuffer.drawCursor();
     }
@@ -81,11 +82,9 @@ class TextEditor {
 			case " ":
 				this.move_cursor_to_right();
 				break;
-			// case "BACKSPACE":
-				// this.move_cursor_to_left();
-				// break;
-                // this.display_terminal_text_content();
-                break;
+			case "BACKSPACE":
+				this.move_cursor_to_left();
+				break;
 			case "CTRL_S":
 				if(this.file != null){this.save_file();}
 				break;
@@ -118,32 +117,50 @@ class TextEditor {
 				if (typeof this.textBuffer.buffer[this.textBuffer.cy] !== 'undefined' && this.textBuffer.cx > this.textBuffer.buffer[this.textBuffer.cy].length - 1) {
 					this.textBuffer.moveToEndOfLine();
 				}
+				this.draw_cursor();
 				break;
 			case 'DOWN':
 				this.textBuffer.moveDown();
-	
 				if (typeof this.textBuffer.buffer[this.textBuffer.cy] !== 'undefined' && this.textBuffer.cx > this.textBuffer.buffer[this.textBuffer.cy].length - 1) {
 					this.textBuffer.moveToEndOfLine();
 				}
+				this.draw_cursor();
 				break;
-				
 			case 'LEFT':
 				this.textBuffer.moveBackward();
+				this.draw_cursor();
+				break;
 			case 'RIGHT':
-				
 				this.textBuffer.moveRight();
+				this.draw_cursor();
+				break;
 			default:
 				if (data.isCharacter) {
 					this.new_char(name);
 				}
                 break;
 		}
-		this.draw_cursor();
 	}
 
     display_terminal_text_content() {
         // console.log("The text is ", this.textBuffer.getText());
     }
+
+	get_char_at_location(x, y) {
+		if (this.x == 1) {
+			// we are at the begining of a line;
+			if (this.y == 2) {
+				return {}
+			}
+			else {
+				let obj_arr = this.textBuffer.buffer[y - 1];
+				return obj_arr[obj_arr.length - 1];
+			}
+		}
+		else {
+			return this.textBuffer.buffer[y - 2][x - 2];
+		}
+	}
 
 	undo_command() {
 		this.TextEditorStateManagementLinkList.get_cur_node().command_obj.redo(this)
@@ -184,10 +201,36 @@ class TextEditor {
 		this.insert_and_execute(node);
 	}
 
+	write_to_log(cont) {
+		fs.appendFile("./test.log", cont, function(err) {
+			if(err) {
+				return console.log(err);
+			}
+		}); 
+	}
+
+	move_cursor_to_left() {
+		/* Check Cursor Location First */
+		this.term.getCursorLocation((error, x, y) => {
+            // this.write_to_log(x.toString() + y.toString());
+			if (x == 1 && y == 2) {
+				// At the top of the screen
+				return;
+			}
+			else {
+				let DeleteCommand = create_Command({"command_type": "delete", "x": x, "y": y});
+				let node = new SnapShotLinkedListNode(DeleteCommand);
+				this.insert_and_execute(node);
+			}
+        });
+	}
+
 	new_char(char) {
-		let appendCommand = create_Command({"command_type": "text","text":char});
-		let node = new SnapShotLinkedListNode(appendCommand);
-		this.insert_and_execute(node);
+		this.term.getCursorLocation((error, x, y) => {
+			let appendCommand = create_Command({"command_type": "text","text":char, "x": x, "y": y});
+			let node = new SnapShotLinkedListNode(appendCommand);
+			this.insert_and_execute(node);
+        })
 	}
 
    

@@ -30,45 +30,44 @@ class SpaceCommand {
 }
 
 class TextCommand {
-    constructor(text) {
+    constructor(text, x, y) {
         // console.log(text);
         this.text = text;
+        this.x = x;
+        this.y = y;
         // console.log(this.text);
     }
     execute(TextEdtiorObj) {
-        TextEdtiorObj.term.getCursorLocation((error, x, y)=>{
-            this.pos_x = x;
-            this.pos_y = y-2;
-        });
-        
         TextEdtiorObj.textBuffer.insert(this.text);
-        
-        
+        TextEdtiorObj.draw_cursor();
     }
 
     redo(TextEdtiorObj) {
         // console.log(this);
-        TextEdtiorObj.textBuffer.moveTo(this.pos_x, this.pos_y);
+        TextEdtiorObj.textBuffer.moveTo(this.x, this.y);
         TextEdtiorObj.textBuffer.backDelete(1);
-
-        
-        
+        TextEdtiorObj.draw_cursor();
     } 
-
 }
 
 class DeleteCommand {
-    constructor(delete_index, delete_num) {
-        this.textEditor.delete_index = delete_index;
-        this.textEditor.delete_num = delete_num;
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
     }
 
-    execute() {
-        // Call execute to delete
+    execute(TextEditorObj) {
+        console.log(this.x, this.y);
+        let obj = TextEditorObj.get_char_at_location(this.x, this.y);
+        this.deleted_char = obj.char;
+        TextEditorObj.textBuffer.backDelete(1);
+        TextEditorObj.draw_cursor();
     }
-
-    redo() {
-        // Call 
+    redo(TextEditorObj) {
+        TextEditorObj.textBuffer.moveTo(this.x - 2, this.y - 2);
+        TextEditorObj.textBuffer.insert(this.deleted_char);
+        TextEditorObj.draw_cursor();
+        return;
     }
 }
 
