@@ -98,11 +98,11 @@ class TextEditor {
 				this.redo();
 				break;
 			case 'ENTER':
-				this.new_char('\n');
+				this.enter();
 				break;
 
 			case 'TAB':
-				this.new_char('\t');
+				this.tab();
 				break;
 			case 'HOME':
 				this.textBuffer.moveToColumn(0);
@@ -228,6 +228,21 @@ class TextEditor {
 	new_char(char) {
 		this.term.getCursorLocation((error, x, y) => {
 			let appendCommand = create_Command({"command_type": "text","text":char, "x": x, "y": y});
+			let node = new SnapShotLinkedListNode(appendCommand);
+			this.insert_and_execute(node);
+        })
+	}
+
+	enter() {
+		this.term.getCursorLocation((error, x, y) => {
+			let appendCommand = create_Command({"command_type": "enter", "x": x, "y": y});
+			let node = new SnapShotLinkedListNode(appendCommand);
+			this.insert_and_execute(node);
+        })
+	}
+	tab() {
+		this.term.getCursorLocation((error, x, y) => {
+			let appendCommand = create_Command({"command_type": "tab", "x": x, "y": y});
 			let node = new SnapShotLinkedListNode(appendCommand);
 			this.insert_and_execute(node);
         })

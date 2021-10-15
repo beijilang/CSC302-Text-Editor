@@ -29,13 +29,47 @@ class SpaceCommand {
 
 }
 
+class EnterCommand {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    execute(TextEdtiorObj) {
+        TextEdtiorObj.textBuffer.newLine();
+        TextEdtiorObj.draw_cursor();
+    }
+
+    redo(TextEdtiorObj) {
+        TextEdtiorObj.textBuffer.moveTo(this.x - 1, this.y - 2);
+
+        TextEdtiorObj.textBuffer.delete(1);
+        TextEdtiorObj.draw_cursor();
+    } 
+}
+
+class TabCommand {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    execute(TextEdtiorObj) {
+        TextEdtiorObj.textBuffer.insert('\t');
+        TextEdtiorObj.draw_cursor();
+    }
+
+    redo(TextEdtiorObj) {
+        TextEdtiorObj.textBuffer.moveTo(this.x-1, this.y - 2);
+
+        TextEdtiorObj.textBuffer.delete(1);
+        TextEdtiorObj.draw_cursor();
+    } 
+}
+
 class TextCommand {
     constructor(text, x, y) {
-        // console.log(text);
         this.text = text;
         this.x = x;
         this.y = y;
-        // console.log(this.text);
     }
     execute(TextEdtiorObj) {
         TextEdtiorObj.textBuffer.insert(this.text);
@@ -43,9 +77,10 @@ class TextCommand {
     }
 
     redo(TextEdtiorObj) {
-        // console.log(this);
-        TextEdtiorObj.textBuffer.moveTo(this.x, this.y);
+        TextEdtiorObj.textBuffer.moveTo(this.x, this.y - 2);
+
         TextEdtiorObj.textBuffer.backDelete(1);
+
         TextEdtiorObj.draw_cursor();
     } 
 }
@@ -57,7 +92,6 @@ class DeleteCommand {
     }
 
     execute(TextEditorObj) {
-        console.log(this.x, this.y);
         let obj = TextEditorObj.get_char_at_location(this.x, this.y);
         this.deleted_char = obj.char;
         TextEditorObj.textBuffer.backDelete(1);
@@ -77,4 +111,4 @@ class DeleteCommand {
 
 
 // Call export here
-export {AppendCommand, DeleteCommand, SpaceCommand, TextCommand};
+export {AppendCommand, DeleteCommand, SpaceCommand, TextCommand, EnterCommand,TabCommand};
