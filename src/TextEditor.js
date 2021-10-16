@@ -23,7 +23,6 @@ class TextEditor {
 		this.screenBuffer.draw({
 			delta: true
 		});
-		
 		this.textBuffer.drawCursor();
 		this.screenBuffer.drawCursor();
     }
@@ -147,13 +146,13 @@ class TextEditor {
     }
 
 	get_char_at_location(x, y) {
-		if (this.x == 1) {
+		if (x == 1) {
 			// we are at the begining of a line;
-			if (this.y == 2) {
+			if (y == 2) {
 				return {}
 			}
 			else {
-				let obj_arr = this.textBuffer.buffer[y - 1];
+				let obj_arr = this.textBuffer.buffer[y - 3];
 				return obj_arr[obj_arr.length - 1];
 			}
 		}
@@ -212,13 +211,19 @@ class TextEditor {
 	move_cursor_to_left() {
 		/* Check Cursor Location First */
 		this.term.getCursorLocation((error, x, y) => {
-            // this.write_to_log(x.toString() + y.toString());
+	
 			if (x == 1 && y == 2) {
 				// At the top of the screen
 				return;
 			}
 			else {
-				let DeleteCommand = create_Command({"command_type": "delete", "x": x, "y": y});
+				let DeleteCommand;
+				if (x == 1) {
+					DeleteCommand = create_Command({"command_type": "delete", "x": x, "y": y});
+				}
+				else {
+					DeleteCommand = create_Command({"command_type": "delete", "x": x, "y": y});
+				}
 				let node = new SnapShotLinkedListNode(DeleteCommand);
 				this.insert_and_execute(node);
 			}

@@ -91,23 +91,18 @@ class DeleteCommand {
         this.y = y;
     }
 
-    execute(TextEditorObj) {
+    execute(TextEditorObj){
         let obj = TextEditorObj.get_char_at_location(this.x, this.y);
         this.deleted_char = obj.char;
         TextEditorObj.textBuffer.backDelete(1);
         TextEditorObj.draw_cursor();
     }
     redo(TextEditorObj) {
-        TextEditorObj.textBuffer.moveTo(this.x - 2, this.y - 2);
         TextEditorObj.textBuffer.insert(this.deleted_char);
         TextEditorObj.draw_cursor();
         return;
     }
 }
-
-
-
-
 
 
 // Call export here
