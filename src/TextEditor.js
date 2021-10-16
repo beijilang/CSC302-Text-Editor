@@ -120,18 +120,18 @@ class TextEditor {
 			case "CTRL_Y":
 				this.redo();
 				break;
-			// case 'ENTER':
-			// 	this.enter();
-			// 	break;
+			case 'ENTER':
+				this.enter();
+				break;
 			// case 'TAB':
 			// 	this.tab();
 			// 	break;
 			case 'HOME':
 				this.textBuffer.moveToColumn(0);
 				break;
-			case 'END':
-				this.textBuffer.moveToEndOfLine();
-				break;
+			// case 'END':
+			// 	this.textBuffer.moveToEndOfLine();
+			// 	break;
 			// case 'UP':
 			// 	this.textBuffer.moveUp();
 			// 	if (typeof this.textBuffer.buffer[this.textBuffer.cy] !== 'undefined' && this.textBuffer.cx > this.textBuffer.buffer[this.textBuffer.cy].length - 1) {
@@ -244,11 +244,11 @@ class TextEditor {
 		this.insert_and_execute(node);
 	}
 
-	// enter() {
-	// 	let appendCommand = create_Command({"command_type": "enter", "x": this.textBuffer.cx, "y": this.textBuffer.cy});
-	// 	let node = new SnapShotLinkedListNode(appendCommand);
-	// 	this.insert_and_execute(node);
-	// }
+	enter() {
+		let appendCommand = create_Command({"command_type": "enter", "x": this.textBuffer.cx, "y": this.textBuffer.cy});
+		let node = new SnapShotLinkedListNode(appendCommand);
+		this.insert_and_execute(node);
+	}
 	
 	// tab() {
 	// 	this.term.getCursorLocation((error, x, y) => {
