@@ -1,20 +1,6 @@
 // Initialize class that has the same structure as the above to make changes. For exmaple, when appending, should Init AppendCommand,
 // And initialize it with the append index and content;
 
-class AppendCommand {
-    constructor(append_index, append_content) {
-        this.textEditor.append_index = append_index;
-        this.textEditor.append_content = append_content;
-    }
-    execute() {
-        // Call Execute to make changes
-    }
-
-    redo() {
-        // Call it to undo the executed change
-    }
-}
-
 class SpaceCommand {
     constructor() {
 
@@ -40,9 +26,7 @@ class EnterCommand {
     }
 
     redo(TextEdtiorObj) {
-        TextEdtiorObj.textBuffer.moveTo(this.x - 1, this.y - 2);
-
-        TextEdtiorObj.textBuffer.delete(1);
+        TextEdtiorObj.textBuffer.backDelete(1);
         TextEdtiorObj.draw_cursor();
     } 
 }
@@ -77,7 +61,7 @@ class TextCommand {
     }
 
     redo(TextEdtiorObj) {
-        TextEdtiorObj.textBuffer.moveTo(this.x, this.y - 2);
+        TextEdtiorObj.textBuffer.moveTo(this.x + 1, this.y);
 
         TextEdtiorObj.textBuffer.backDelete(1);
 
@@ -106,4 +90,4 @@ class DeleteCommand {
 
 
 // Call export here
-export {AppendCommand, DeleteCommand, SpaceCommand, TextCommand, EnterCommand,TabCommand};
+export {DeleteCommand, SpaceCommand, TextCommand, EnterCommand,TabCommand};

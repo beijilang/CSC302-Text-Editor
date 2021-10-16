@@ -18,13 +18,44 @@ class TextEditor {
 		})
     }
 
+	/* Credit: TermIt https://github.com/hakash/termit*/
+	update_Cursor() {
+
+		let new_buffer_x = this.textBuffer.x;
+		let new_buffer_y = this.textBuffer.y;
+
+		if (this.textBuffer.x < -this.textBuffer.cx) {
+			new_buffer_x = Math.min(0, -this.textBuffer.cx + Math.floor(this.screenBuffer.width / 2));
+		} else if (this.textBuffer.x > -this.textBuffer.cx + this.screenBuffer.width - 1) {
+			new_buffer_x = (this.screenBuffer.width / 2) - this.textBuffer.cx;
+		}
+
+		if (this.textBuffer.y < -this.textBuffer.cy) {
+			new_buffer_y = Math.min(0, -this.textBuffer.cy + Math.floor(this.screenBuffer.height / 2));
+		} else if (this.textBuffer.y > -this.textBuffer.cy + this.screenBuffer.height - 1) {
+			new_buffer_y = (this.screenBuffer.height / 2) - this.textBuffer.cy;
+		}
+
+		if (new_buffer_y != this.textBuffer.y || new_buffer_x != this.textBuffer.x) {
+			this.textBuffer.x = new_buffer_x;
+			this.textBuffer.y = new_buffer_y;
+			this.textBuffer.draw();
+			this.screenBuffer.draw({
+				delta: true
+			});
+		}
+		this.textBuffer.drawCursor();
+		this.screenBuffer.drawCursor();
+	}
+
     draw_cursor() {
 		this.textBuffer.draw();
 		this.screenBuffer.draw({
 			delta: true
 		});
-		this.textBuffer.drawCursor();
-		this.screenBuffer.drawCursor();
+		// this.textBuffer.drawCursor();
+		// this.screenBuffer.drawCursor();
+		this.update_Cursor();
     }
 
 	// Init a blank terminal for write
@@ -71,16 +102,9 @@ class TextEditor {
 	warning_tmp(){
 	}
 
-    log_cur_location() {
-        this.term.getCursorLocation((err, x, y) => console.log(x, y));
-    }
-
 
 	handle_key_press_event(name, data) {
 		switch(name) {
-			case " ":
-				this.move_cursor_to_right();
-				break;
 			case "BACKSPACE":
 				this.move_cursor_to_left();
 				break;
@@ -96,43 +120,40 @@ class TextEditor {
 			case "CTRL_Y":
 				this.redo();
 				break;
-			case 'ENTER':
-				this.enter();
-				break;
-
-			case 'TAB':
-				this.tab();
-				break;
+			// case 'ENTER':
+			// 	this.enter();
+			// 	break;
+			// case 'TAB':
+			// 	this.tab();
+			// 	break;
 			case 'HOME':
 				this.textBuffer.moveToColumn(0);
-				
 				break;
 			case 'END':
 				this.textBuffer.moveToEndOfLine();
 				break;
-
-			case 'UP':
-				this.textBuffer.moveUp();
-				if (typeof this.textBuffer.buffer[this.textBuffer.cy] !== 'undefined' && this.textBuffer.cx > this.textBuffer.buffer[this.textBuffer.cy].length - 1) {
-					this.textBuffer.moveToEndOfLine();
-				}
-				this.draw_cursor();
-				break;
-			case 'DOWN':
-				this.textBuffer.moveDown();
-				if (typeof this.textBuffer.buffer[this.textBuffer.cy] !== 'undefined' && this.textBuffer.cx > this.textBuffer.buffer[this.textBuffer.cy].length - 1) {
-					this.textBuffer.moveToEndOfLine();
-				}
-				this.draw_cursor();
-				break;
-			case 'LEFT':
-				this.textBuffer.moveBackward();
-				this.draw_cursor();
-				break;
-			case 'RIGHT':
-				this.textBuffer.moveRight();
-				this.draw_cursor();
-				break;
+			// case 'UP':
+			// 	this.textBuffer.moveUp();
+			// 	if (typeof this.textBuffer.buffer[this.textBuffer.cy] !== 'undefined' && this.textBuffer.cx > this.textBuffer.buffer[this.textBuffer.cy].length - 1) {
+			// 		this.textBuffer.moveToEndOfLine();
+			// 	}
+			// 	this.draw_cursor();
+			// 	break;
+			// case 'DOWN':
+			// 	this.textBuffer.moveDown();
+			// 	if (typeof this.textBuffer.buffer[this.textBuffer.cy] !== 'undefined' && this.textBuffer.cx > this.textBuffer.buffer[this.textBuffer.cy].length - 1) {
+			// 		this.textBuffer.moveToEndOfLine();
+			// 	}
+			// 	this.draw_cursor();
+			// 	break;
+			// case 'LEFT':
+			// 	this.textBuffer.moveBackward();
+			// 	this.draw_cursor();
+			// 	break;
+			// case 'RIGHT':
+			// 	this.textBuffer.moveRight();
+			// 	this.draw_cursor();
+			// 	break;
 			default:
 				if (data.isCharacter) {
 					this.new_char(name);
@@ -140,10 +161,6 @@ class TextEditor {
                 break;
 		}
 	}
-
-    display_terminal_text_content() {
-        // console.log("The text is ", this.textBuffer.getText());
-    }
 
 	get_char_at_location(x, y) {
 		if (x == 1) {
@@ -177,7 +194,6 @@ class TextEditor {
 	undo() {
 		let prev_state = this.TextEditorStateManagementLinkList.get_last_action();
 		if (prev_state == null) {
-			console.log("Can no longer UNDO");
 			return;
 		}
 		this.undo_command();
@@ -187,17 +203,10 @@ class TextEditor {
 	redo() {
 		let next_state = this.TextEditorStateManagementLinkList.get_next_action();
 		if (next_state == null) {
-			console.log("Can not redo");
 			return;
 		}
 		this.TextEditorStateManagementLinkList.move_cursor_to_right();
 		this.redo_command()
-	}
-
-	move_cursor_to_right() {
-		let appendCommand = create_Command({"command_type": "space"});
-		let node = new SnapShotLinkedListNode(appendCommand);
-		this.insert_and_execute(node);
 	}
 
 	write_to_log(cont) {
@@ -211,7 +220,6 @@ class TextEditor {
 	move_cursor_to_left() {
 		/* Check Cursor Location First */
 		this.term.getCursorLocation((error, x, y) => {
-	
 			if (x == 1 && y == 2) {
 				// At the top of the screen
 				return;
@@ -231,27 +239,24 @@ class TextEditor {
 	}
 
 	new_char(char) {
-		this.term.getCursorLocation((error, x, y) => {
-			let appendCommand = create_Command({"command_type": "text","text":char, "x": x, "y": y});
-			let node = new SnapShotLinkedListNode(appendCommand);
-			this.insert_and_execute(node);
-        })
+		let appendCommand = create_Command({"command_type": "text","text":char, "x": this.textBuffer.cx, "y":  this.textBuffer.cy});
+		let node = new SnapShotLinkedListNode(appendCommand);
+		this.insert_and_execute(node);
 	}
 
-	enter() {
-		this.term.getCursorLocation((error, x, y) => {
-			let appendCommand = create_Command({"command_type": "enter", "x": x, "y": y});
-			let node = new SnapShotLinkedListNode(appendCommand);
-			this.insert_and_execute(node);
-        })
-	}
-	tab() {
-		this.term.getCursorLocation((error, x, y) => {
-			let appendCommand = create_Command({"command_type": "tab", "x": x, "y": y});
-			let node = new SnapShotLinkedListNode(appendCommand);
-			this.insert_and_execute(node);
-        })
-	}
+	// enter() {
+	// 	let appendCommand = create_Command({"command_type": "enter", "x": this.textBuffer.cx, "y": this.textBuffer.cy});
+	// 	let node = new SnapShotLinkedListNode(appendCommand);
+	// 	this.insert_and_execute(node);
+	// }
+	
+	// tab() {
+	// 	this.term.getCursorLocation((error, x, y) => {
+	// 		let appendCommand = create_Command({"command_type": "tab", "x": x, "y": y});
+	// 		let node = new SnapShotLinkedListNode(appendCommand);
+	// 		this.insert_and_execute(node);
+    //     })
+	// }
 
    
 

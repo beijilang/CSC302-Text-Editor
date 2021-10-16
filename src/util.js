@@ -1,4 +1,4 @@
-import {AppendCommand, DeleteCommand, SpaceCommand, TextCommand, EnterCommand,TabCommand} from './commandPattern.js'
+import {DeleteCommand, SpaceCommand, TextCommand, EnterCommand,TabCommand} from './commandPattern.js'
 
 export function create_Command(command_obj) {
     if (command_obj.command_type == "append") {
