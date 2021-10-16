@@ -2,6 +2,7 @@ import { create_Command } from './util.js';
 import termKit from 'terminal-kit';
 import * as fs from 'fs';
 import {SnapShotLinkedListNode, TextEditorStateManagementLinkList} from './ObjectState.js'
+import { timingSafeEqual } from 'crypto';
 
 class TextEditor {
     constructor(input_parameter = {}) {
@@ -53,9 +54,8 @@ class TextEditor {
 		this.screenBuffer.draw({
 			delta: true
 		});
-		// this.textBuffer.drawCursor();
-		// this.screenBuffer.drawCursor();
-		this.update_Cursor();
+		this.textBuffer.drawCursor();
+		this.screenBuffer.drawCursor();
     }
 
 	// Init a blank terminal for write
@@ -106,7 +106,7 @@ class TextEditor {
 	handle_key_press_event(name, data) {
 		switch(name) {
 			case "BACKSPACE":
-				this.move_cursor_to_left();
+				this.backspace();
 				break;
 			case "CTRL_S":
 				if(this.file != null){this.save_file();}
@@ -126,34 +126,45 @@ class TextEditor {
 			case 'TAB':
 				this.tab();
 				break;
-			case 'HOME':
-				this.textBuffer.moveToColumn(0);
-				break;
+			// case 'HOME':
+			// 	this.textBuffer.moveToColumn(0);
+			// 	break;
 			// case 'END':
 			// 	this.textBuffer.moveToEndOfLine();
 			// 	break;
-			// case 'UP':
-			// 	this.textBuffer.moveUp();
-			// 	if (typeof this.textBuffer.buffer[this.textBuffer.cy] !== 'undefined' && this.textBuffer.cx > this.textBuffer.buffer[this.textBuffer.cy].length - 1) {
-			// 		this.textBuffer.moveToEndOfLine();
-			// 	}
-			// 	this.draw_cursor();
-			// 	break;
-			// case 'DOWN':
-			// 	this.textBuffer.moveDown();
-			// 	if (typeof this.textBuffer.buffer[this.textBuffer.cy] !== 'undefined' && this.textBuffer.cx > this.textBuffer.buffer[this.textBuffer.cy].length - 1) {
-			// 		this.textBuffer.moveToEndOfLine();
-			// 	}
-			// 	this.draw_cursor();
-			// 	break;
-			// case 'LEFT':
-			// 	this.textBuffer.moveBackward();
-			// 	this.draw_cursor();
-			// 	break;
-			// case 'RIGHT':
-			// 	this.textBuffer.moveRight();
-			// 	this.draw_cursor();
-			// 	break;
+			case 'UP':
+				if (this.textBuffer.cy == 0) {
+					return;
+				}
+				else {
+					// Move curosr [vertical offset, horizontal offset]
+					this.move_cursor([0, -1]);
+				}
+				break;
+			case 'DOWN':
+				// If at last line just return
+				if (this.textBuffer.cy == this.textBuffer.buffer.length - 1) {
+					return;
+				} 
+				else {
+					this.move_cursor([0, 1]);
+				}
+				break;
+			case 'LEFT':
+				if (this.textBuffer.cy == 0 && this.textBuffer.cx == 0) {
+					return;
+				}
+				else {
+					this.move_cursor([-1, 0]);
+				}
+				break;
+			case 'RIGHT':
+				if (this.textBuffer.cy == this.textBuffer.buffer.length - 1 && this.textBuffer.cx == (this.textBuffer.buffer[this.textBuffer.buffer.length - 1].length)) {
+					return;
+				}
+				else {
+					this.move_cursor([1, 0]);	
+				}
 			default:
 				if (data.isCharacter) {
 					this.new_char(name);
@@ -217,7 +228,7 @@ class TextEditor {
 		}); 
 	}
 
-	move_cursor_to_left() {
+	backspace() {
 		/* Check Cursor Location First */
 		this.term.getCursorLocation((error, x, y) => {
 			if (x == 1 && y == 2) {
@@ -253,6 +264,12 @@ class TextEditor {
 	tab() {
 		let appendCommand = create_Command({"command_type": "tab", "x": this.textBuffer.cx, "y": this.textBuffer.cy});
 		let node = new SnapShotLinkedListNode(appendCommand);
+		this.insert_and_execute(node);
+	}
+
+	move_cursor(offset) {
+		let movecursorCommand = create_Command({"command_type": "move_cursor", "offset": offset})
+		let node = new SnapShotLinkedListNode(movecursorCommand);
 		this.insert_and_execute(node);
 	}
 
