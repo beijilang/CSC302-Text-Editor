@@ -123,9 +123,9 @@ class TextEditor {
 			case 'ENTER':
 				this.enter();
 				break;
-			// case 'TAB':
-			// 	this.tab();
-			// 	break;
+			case 'TAB':
+				this.tab();
+				break;
 			case 'HOME':
 				this.textBuffer.moveToColumn(0);
 				break;
@@ -250,13 +250,11 @@ class TextEditor {
 		this.insert_and_execute(node);
 	}
 	
-	// tab() {
-	// 	this.term.getCursorLocation((error, x, y) => {
-	// 		let appendCommand = create_Command({"command_type": "tab", "x": x, "y": y});
-	// 		let node = new SnapShotLinkedListNode(appendCommand);
-	// 		this.insert_and_execute(node);
-    //     })
-	// }
+	tab() {
+		let appendCommand = create_Command({"command_type": "tab", "x": this.textBuffer.cx, "y": this.textBuffer.cy});
+		let node = new SnapShotLinkedListNode(appendCommand);
+		this.insert_and_execute(node);
+	}
 
    
 

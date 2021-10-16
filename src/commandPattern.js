@@ -42,9 +42,7 @@ class TabCommand {
     }
 
     redo(TextEdtiorObj) {
-        TextEdtiorObj.textBuffer.moveTo(this.x-1, this.y - 2);
-
-        TextEdtiorObj.textBuffer.delete(1);
+        TextEdtiorObj.textBuffer.backDelete(1);
         TextEdtiorObj.draw_cursor();
     } 
 }
@@ -61,10 +59,7 @@ class TextCommand {
     }
 
     redo(TextEdtiorObj) {
-        TextEdtiorObj.textBuffer.moveTo(this.x + 1, this.y);
-
         TextEdtiorObj.textBuffer.backDelete(1);
-
         TextEdtiorObj.draw_cursor();
     } 
 }
