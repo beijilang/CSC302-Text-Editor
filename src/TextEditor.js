@@ -17,37 +17,9 @@ class TextEditor {
 		this.textBuffer = new termKit.TextBuffer({
 			dst: this.screenBuffer
 		})
+		
     }
 
-	/* Credit: TermIt https://github.com/hakash/termit*/
-	update_Cursor() {
-
-		let new_buffer_x = this.textBuffer.x;
-		let new_buffer_y = this.textBuffer.y;
-
-		if (this.textBuffer.x < -this.textBuffer.cx) {
-			new_buffer_x = Math.min(0, -this.textBuffer.cx + Math.floor(this.screenBuffer.width / 2));
-		} else if (this.textBuffer.x > -this.textBuffer.cx + this.screenBuffer.width - 1) {
-			new_buffer_x = (this.screenBuffer.width / 2) - this.textBuffer.cx;
-		}
-
-		if (this.textBuffer.y < -this.textBuffer.cy) {
-			new_buffer_y = Math.min(0, -this.textBuffer.cy + Math.floor(this.screenBuffer.height / 2));
-		} else if (this.textBuffer.y > -this.textBuffer.cy + this.screenBuffer.height - 1) {
-			new_buffer_y = (this.screenBuffer.height / 2) - this.textBuffer.cy;
-		}
-
-		if (new_buffer_y != this.textBuffer.y || new_buffer_x != this.textBuffer.x) {
-			this.textBuffer.x = new_buffer_x;
-			this.textBuffer.y = new_buffer_y;
-			this.textBuffer.draw();
-			this.screenBuffer.draw({
-				delta: true
-			});
-		}
-		this.textBuffer.drawCursor();
-		this.screenBuffer.drawCursor();
-	}
 
     draw_cursor() {
 		this.textBuffer.draw();
@@ -126,12 +98,14 @@ class TextEditor {
 			case 'TAB':
 				this.tab();
 				break;
-			// case 'HOME':
-			// 	this.textBuffer.moveToColumn(0);
-			// 	break;
-			// case 'END':
-			// 	this.textBuffer.moveToEndOfLine();
-			// 	break;
+			case 'HOME':
+				this.textBuffer.moveToColumn(0);
+				this.draw_cursor();
+				break;
+			case 'END':
+				this.textBuffer.moveToEndOfLine();
+				this.draw_cursor();
+				break;
 			case 'UP':
 				if (this.textBuffer.cy == 0) {
 					return;
@@ -160,7 +134,7 @@ class TextEditor {
 				break;
 			case 'RIGHT':
 				if (this.textBuffer.cy == this.textBuffer.buffer.length - 1 && this.textBuffer.cx == (this.textBuffer.buffer[this.textBuffer.buffer.length - 1].length)) {
-					return;
+					return;  
 				}
 				else {
 					this.move_cursor([1, 0]);	
@@ -174,26 +148,32 @@ class TextEditor {
 	}
 
 	get_char_at_location(x, y) {
-		if (x == 1) {
-			// we are at the begining of a line;
-			if (y == 2) {
-				return {}
-			}
-			else {
-				let obj_arr = this.textBuffer.buffer[y - 3];
-				return obj_arr[obj_arr.length - 1];
-			}
+		if (x == 0) {
+			let last_index = this.textBuffer.buffer[y - 1].length - 1
+			return this.textBuffer.buffer[y - 1][last_index];
 		}
 		else {
-			return this.textBuffer.buffer[y - 2][x - 2];
+			return this.textBuffer.buffer[y][x-1];
 		}
 	}
 
+	restore_cusor_location_to_undo(command_node) {
+		this.textBuffer.moveTo(command_node.undo_x, command_node.undo_y);
+		this.draw_cursor();
+	}
+
+	restore_cusor_location_to_redo(command_node) {
+		this.textBuffer.moveTo(command_node.x, command_node.y);
+		this.draw_cursor();
+	}
+
 	undo_command() {
+		this.restore_cusor_location_to_undo(this.TextEditorStateManagementLinkList.get_cur_node().command_obj);
 		this.TextEditorStateManagementLinkList.get_cur_node().command_obj.redo(this)
 	}
 
 	redo_command() {
+		this.restore_cusor_location_to_redo(this.TextEditorStateManagementLinkList.get_cur_node().command_obj);
 		this.TextEditorStateManagementLinkList.get_cur_node().command_obj.execute(this)
 	}
 
@@ -206,7 +186,7 @@ class TextEditor {
 		let prev_state = this.TextEditorStateManagementLinkList.get_last_action();
 		if (prev_state == null) {
 			return;
-		}
+		} 
 		this.undo_command();
 		this.TextEditorStateManagementLinkList.move_cur_node_to_left();
 	}
@@ -230,23 +210,14 @@ class TextEditor {
 
 	backspace() {
 		/* Check Cursor Location First */
-		this.term.getCursorLocation((error, x, y) => {
-			if (x == 1 && y == 2) {
-				// At the top of the screen
-				return;
-			}
-			else {
-				let DeleteCommand;
-				if (x == 1) {
-					DeleteCommand = create_Command({"command_type": "delete", "x": x, "y": y});
-				}
-				else {
-					DeleteCommand = create_Command({"command_type": "delete", "x": x, "y": y});
-				}
-				let node = new SnapShotLinkedListNode(DeleteCommand);
-				this.insert_and_execute(node);
-			}
-        });
+		if (this.textBuffer.cx == 0 && this.textBuffer.cy == 0) {
+			return;
+		}
+		else {
+			let DeleteCommand = create_Command({"command_type": "delete", "x": this.textBuffer.cx, "y": this.textBuffer.cy});
+			let node = new SnapShotLinkedListNode(DeleteCommand);
+			this.insert_and_execute(node);
+		}
 	}
 
 	new_char(char) {
@@ -268,9 +239,8 @@ class TextEditor {
 	}
 
 	move_cursor(offset) {
-		let movecursorCommand = create_Command({"command_type": "move_cursor", "offset": offset})
-		let node = new SnapShotLinkedListNode(movecursorCommand);
-		this.insert_and_execute(node);
+		this.textBuffer.move(offset[0], offset[1]);
+		this.draw_cursor();
 	}
 
    

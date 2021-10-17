@@ -3,91 +3,93 @@
 
 
 class EnterCommand {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-    execute(TextEdtiorObj) {
-        TextEdtiorObj.textBuffer.newLine();
-        TextEdtiorObj.draw_cursor();
+    constructor(x, y, c_type) {
+        this.c_type = c_type;
     }
 
-    redo(TextEdtiorObj) {
-        TextEdtiorObj.textBuffer.backDelete(1);
-        TextEdtiorObj.draw_cursor();
+
+    execute(TextEditorObj) {
+        TextEditorObj.textBuffer.newLine();
+        this.undo_x = TextEditorObj.textBuffer.cx;
+        this.undo_y = TextEditorObj.textBuffer.cy;
+        TextEditorObj.draw_cursor();
+    }
+
+    redo(TextEditorObj) {
+        TextEditorObj.textBuffer.backDelete(1);
+        this.x = TextEditorObj.textBuffer.cx;
+        this.y = TextEditorObj.textBuffer.cy;
+        TextEditorObj.draw_cursor();
     } 
 }
 
 class TabCommand {
-    constructor(x, y) {
+    constructor(x, y, c_type) {
         this.x = x;
         this.y = y;
-    }
-    execute(TextEdtiorObj) {
-        TextEdtiorObj.textBuffer.insert('\t');
-        TextEdtiorObj.draw_cursor();
+        this.c_type = c_type;
     }
 
-    redo(TextEdtiorObj) {
-        TextEdtiorObj.textBuffer.backDelete(1);
-        TextEdtiorObj.draw_cursor();
+    execute(TextEditorObj) {
+        TextEditorObj.textBuffer.insert('\t');
+        this.undo_x = TextEditorObj.textBuffer.cx;
+        this.undo_y = TextEditorObj.textBuffer.cy;
+        TextEditorObj.draw_cursor();
+    }
+
+    redo(TextEditorObj) {
+        TextEditorObj.textBuffer.backDelete(1);
+        this.x = TextEditorObj.textBuffer.cx;
+        this.y = TextEditorObj.textBuffer.cy;
+        TextEditorObj.draw_cursor();
     } 
 }
 
 class TextCommand {
-    constructor(text, x, y) {
+    constructor(text, x, y, c_type) {
         this.text = text;
-        this.x = x;
-        this.y = y;
-    }
-    execute(TextEdtiorObj) {
-        TextEdtiorObj.textBuffer.insert(this.text);
-        TextEdtiorObj.draw_cursor();
+        this.c_type = c_type;
     }
 
-    redo(TextEdtiorObj) {
-        TextEdtiorObj.textBuffer.backDelete(1);
-        TextEdtiorObj.draw_cursor();
+    execute(TextEditorObj) {
+        TextEditorObj.textBuffer.insert(this.text);
+        this.undo_x = TextEditorObj.textBuffer.cx;
+        this.undo_y = TextEditorObj.textBuffer.cy;
+        TextEditorObj.draw_cursor();
+    }
+
+    redo(TextEditorObj) {
+        TextEditorObj.textBuffer.backDelete(1);
+        this.x = TextEditorObj.textBuffer.cx;
+        this.y = TextEditorObj.textBuffer.cy;
+        TextEditorObj.draw_cursor();
     } 
 }
 
 class DeleteCommand {
-    constructor(x, y) {
+    constructor(x, y, c_type) {
         this.x = x;
         this.y = y;
+        this.c_type = c_type;
     }
 
     execute(TextEditorObj){
         let obj = TextEditorObj.get_char_at_location(this.x, this.y);
         this.deleted_char = obj.char;
         TextEditorObj.textBuffer.backDelete(1);
+        this.undo_x = TextEditorObj.textBuffer.cx;
+        this.undo_y = TextEditorObj.textBuffer.cy;
         TextEditorObj.draw_cursor();
     }
     redo(TextEditorObj) {
         TextEditorObj.textBuffer.insert(this.deleted_char);
+        this.x = TextEditorObj.textBuffer.cx;
+        this.y = TextEditorObj.textBuffer.cy;
         TextEditorObj.draw_cursor();
         return;
-    }
-}
-
-class CursorCommand {
-    constructor(offset) {
-        this.vertical_move = offset[0]
-        this.horizontal_move = offset[1]
-    }
-
-    execute(TextEditor) {
-        TextEditor.textBuffer.move(this.vertical_move, this.horizontal_move);
-        TextEditor.draw_cursor();
-    }
-
-    redo(TextEditor) {
-        return;
-        TextEditor.textBuffer.move(-this.vertical_move, -this.horizontal_move);
-        TextEditor.draw_cursor();
     }
 }
 
 
 // Call export here
-export {DeleteCommand, TextCommand, EnterCommand,TabCommand, CursorCommand};
+export {DeleteCommand, TextCommand, EnterCommand,TabCommand};
