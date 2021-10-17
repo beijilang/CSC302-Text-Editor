@@ -240,6 +240,11 @@ class TextEditor {
 
 	move_cursor(offset) {
 		this.textBuffer.move(offset[0], offset[1]);
+		// According to the design, it is impossible for the cursor to extend the length of textbuffer.buffer.
+		// But it is possible for cx to extend the range of the array, detect this here
+		if (this.textBuffer.cx >= this.textBuffer.buffer[this.textBuffer.cy].length) {
+			this.textBuffer.moveToEndOfLine();
+		}
 		this.draw_cursor();
 	}
 
