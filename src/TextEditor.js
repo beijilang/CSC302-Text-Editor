@@ -3,6 +3,7 @@ import termKit from 'terminal-kit';
 import * as fs from 'fs';
 import {SnapShotLinkedListNode, TextEditorStateManagementLinkList} from './ObjectState.js'
 import { timingSafeEqual } from 'crypto';
+import { timeStamp } from 'console';
 
 class TextEditor {
     constructor(input_parameter = {}) {
@@ -20,6 +21,17 @@ class TextEditor {
 		
     }
 
+	onResize(width, height) {
+		this.screenBuffer.resize({
+			x: 0,
+			y: 2,
+			width: width,
+			height: height - 2
+		});
+		this.drawBar({x:1, y:1},'Hit CTRL-C to quit.\n\n');
+		this.draw_cursor();
+	}
+
 
     draw_cursor() {
 		this.textBuffer.draw();
@@ -30,14 +42,20 @@ class TextEditor {
 		this.screenBuffer.drawCursor();
     }
 
+	drawBar(pos, message) {
+		this.term.moveTo(pos.x, pos.y).green(' ' + message);
+	}
+
+
 	// Init a blank terminal for write
 	init(file) {
         this.term.clear();
-		this.term.green( 'Hit CTRL-C to quit.\n\n' ) ;
 		this.term.grabInput( { mouse: 'button' } ) ;
+		this.term.green( 'Hit CTRL-C to quit.\n\n' );
 		this.term.on( 'key' , ( name , matches , data ) => {
 			this.handle_key_press_event(name,data)
 		}) ;
+		this.term.on('resize', (width, height) => this.onResize(width, height));
         this.textBuffer.moveTo(0,0);
         this.screenBuffer.moveTo(0,0);
         this.draw_cursor();
