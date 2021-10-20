@@ -100,18 +100,15 @@ class TextEditor {
 			case 'ENTER':
 				this.new_char('\n');
 				break;
-
 			case 'TAB':
 				this.new_char('\t');
 				break;
 			case 'HOME':
 				this.textBuffer.moveToColumn(0);
-				
 				break;
 			case 'END':
 				this.textBuffer.moveToEndOfLine();
 				break;
-
 			case 'UP':
 				this.textBuffer.moveUp();
 				if (typeof this.textBuffer.buffer[this.textBuffer.cy] !== 'undefined' && this.textBuffer.cx > this.textBuffer.buffer[this.textBuffer.cy].length - 1) {

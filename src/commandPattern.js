@@ -43,7 +43,6 @@ class TextCommand {
     }
 
     redo(TextEdtiorObj) {
-        // console.log(this);
         TextEdtiorObj.textBuffer.moveTo(this.x, this.y);
         TextEdtiorObj.textBuffer.backDelete(1);
         TextEdtiorObj.draw_cursor();
@@ -57,7 +56,6 @@ class DeleteCommand {
     }
 
     execute(TextEditorObj) {
-        console.log(this.x, this.y);
         let obj = TextEditorObj.get_char_at_location(this.x, this.y);
         this.deleted_char = obj.char;
         TextEditorObj.textBuffer.backDelete(1);
