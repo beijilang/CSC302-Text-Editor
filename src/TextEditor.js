@@ -2,6 +2,7 @@ import { create_Command } from './util.js';
 import termKit from 'terminal-kit';
 import * as fs from 'fs';
 import {SnapShotLinkedListNode, TextEditorStateManagementLinkList} from './ObjectState.js'
+import { timingSafeEqual } from 'crypto';
 
 class TextEditor {
     constructor(input_parameter = {}) {
@@ -16,14 +17,15 @@ class TextEditor {
 		this.textBuffer = new termKit.TextBuffer({
 			dst: this.screenBuffer
 		})
+		
     }
+
 
     draw_cursor() {
 		this.textBuffer.draw();
 		this.screenBuffer.draw({
 			delta: true
 		});
-		
 		this.textBuffer.drawCursor();
 		this.screenBuffer.drawCursor();
     }
@@ -72,18 +74,11 @@ class TextEditor {
 	warning_tmp(){
 	}
 
-    log_cur_location() {
-        this.term.getCursorLocation((err, x, y) => console.log(x, y));
-    }
-
 
 	handle_key_press_event(name, data) {
 		switch(name) {
-			case " ":
-				this.move_cursor_to_right();
-				break;
 			case "BACKSPACE":
-				this.move_cursor_to_left();
+				this.backspace();
 				break;
 			case "CTRL_S":
 				if(this.file != null){this.save_file();}
@@ -98,39 +93,52 @@ class TextEditor {
 				this.redo();
 				break;
 			case 'ENTER':
-				this.new_char('\n');
+				this.enter();
 				break;
 			case 'TAB':
-				this.new_char('\t');
+				this.tab();
 				break;
 			case 'HOME':
 				this.textBuffer.moveToColumn(0);
+				this.draw_cursor();
 				break;
 			case 'END':
 				this.textBuffer.moveToEndOfLine();
+				this.draw_cursor();
 				break;
 			case 'UP':
-				this.textBuffer.moveUp();
-				if (typeof this.textBuffer.buffer[this.textBuffer.cy] !== 'undefined' && this.textBuffer.cx > this.textBuffer.buffer[this.textBuffer.cy].length - 1) {
-					this.textBuffer.moveToEndOfLine();
+				if (this.textBuffer.cy == 0) {
+					return;
 				}
-				this.draw_cursor();
+				else {
+					// Move curosr [vertical offset, horizontal offset]
+					this.move_cursor([0, -1]);
+				}
 				break;
 			case 'DOWN':
-				this.textBuffer.moveDown();
-				if (typeof this.textBuffer.buffer[this.textBuffer.cy] !== 'undefined' && this.textBuffer.cx > this.textBuffer.buffer[this.textBuffer.cy].length - 1) {
-					this.textBuffer.moveToEndOfLine();
+				// If at last line just return
+				if (this.textBuffer.cy == this.textBuffer.buffer.length - 1) {
+					return;
+				} 
+				else {
+					this.move_cursor([0, 1]);
 				}
-				this.draw_cursor();
 				break;
 			case 'LEFT':
-				this.textBuffer.moveBackward();
-				this.draw_cursor();
+				if (this.textBuffer.cy == 0 && this.textBuffer.cx == 0) {
+					return;
+				}
+				else {
+					this.move_cursor([-1, 0]);
+				}
 				break;
 			case 'RIGHT':
-				this.textBuffer.moveRight();
-				this.draw_cursor();
-				break;
+				if (this.textBuffer.cy == this.textBuffer.buffer.length - 1 && this.textBuffer.cx == (this.textBuffer.buffer[this.textBuffer.buffer.length - 1].length)) {
+					return;  
+				}
+				else {
+					this.move_cursor([1, 0]);	
+				}
 			default:
 				if (data.isCharacter) {
 					this.new_char(name);
@@ -139,31 +147,33 @@ class TextEditor {
 		}
 	}
 
-    display_terminal_text_content() {
-        // console.log("The text is ", this.textBuffer.getText());
-    }
-
 	get_char_at_location(x, y) {
-		if (this.x == 1) {
-			// we are at the begining of a line;
-			if (this.y == 2) {
-				return {}
-			}
-			else {
-				let obj_arr = this.textBuffer.buffer[y - 1];
-				return obj_arr[obj_arr.length - 1];
-			}
+		if (x == 0) {
+			let last_index = this.textBuffer.buffer[y - 1].length - 1
+			return this.textBuffer.buffer[y - 1][last_index];
 		}
 		else {
-			return this.textBuffer.buffer[y - 2][x - 2];
+			return this.textBuffer.buffer[y][x-1];
 		}
 	}
 
+	restore_cusor_location_to_undo(command_node) {
+		this.textBuffer.moveTo(command_node.undo_x, command_node.undo_y);
+		this.draw_cursor();
+	}
+
+	restore_cusor_location_to_redo(command_node) {
+		this.textBuffer.moveTo(command_node.x, command_node.y);
+		this.draw_cursor();
+	}
+
 	undo_command() {
+		this.restore_cusor_location_to_undo(this.TextEditorStateManagementLinkList.get_cur_node().command_obj);
 		this.TextEditorStateManagementLinkList.get_cur_node().command_obj.redo(this)
 	}
 
 	redo_command() {
+		this.restore_cusor_location_to_redo(this.TextEditorStateManagementLinkList.get_cur_node().command_obj);
 		this.TextEditorStateManagementLinkList.get_cur_node().command_obj.execute(this)
 	}
 
@@ -175,9 +185,8 @@ class TextEditor {
 	undo() {
 		let prev_state = this.TextEditorStateManagementLinkList.get_last_action();
 		if (prev_state == null) {
-			console.log("Can no longer UNDO");
 			return;
-		}
+		} 
 		this.undo_command();
 		this.TextEditorStateManagementLinkList.move_cur_node_to_left();
 	}
@@ -185,17 +194,10 @@ class TextEditor {
 	redo() {
 		let next_state = this.TextEditorStateManagementLinkList.get_next_action();
 		if (next_state == null) {
-			console.log("Can not redo");
 			return;
 		}
 		this.TextEditorStateManagementLinkList.move_cursor_to_right();
 		this.redo_command()
-	}
-
-	move_cursor_to_right() {
-		let appendCommand = create_Command({"command_type": "space"});
-		let node = new SnapShotLinkedListNode(appendCommand);
-		this.insert_and_execute(node);
 	}
 
 	write_to_log(cont) {
@@ -206,28 +208,44 @@ class TextEditor {
 		}); 
 	}
 
-	move_cursor_to_left() {
+	backspace() {
 		/* Check Cursor Location First */
-		this.term.getCursorLocation((error, x, y) => {
-            // this.write_to_log(x.toString() + y.toString());
-			if (x == 1 && y == 2) {
-				// At the top of the screen
-				return;
-			}
-			else {
-				let DeleteCommand = create_Command({"command_type": "delete", "x": x, "y": y});
-				let node = new SnapShotLinkedListNode(DeleteCommand);
-				this.insert_and_execute(node);
-			}
-        });
+		if (this.textBuffer.cx == 0 && this.textBuffer.cy == 0) {
+			return;
+		}
+		else {
+			let DeleteCommand = create_Command({"command_type": "delete", "x": this.textBuffer.cx, "y": this.textBuffer.cy});
+			let node = new SnapShotLinkedListNode(DeleteCommand);
+			this.insert_and_execute(node);
+		}
 	}
 
 	new_char(char) {
-		this.term.getCursorLocation((error, x, y) => {
-			let appendCommand = create_Command({"command_type": "text","text":char, "x": x, "y": y});
-			let node = new SnapShotLinkedListNode(appendCommand);
-			this.insert_and_execute(node);
-        })
+		let appendCommand = create_Command({"command_type": "text","text":char, "x": this.textBuffer.cx, "y":  this.textBuffer.cy});
+		let node = new SnapShotLinkedListNode(appendCommand);
+		this.insert_and_execute(node);
+	}
+
+	enter() {
+		let appendCommand = create_Command({"command_type": "enter", "x": this.textBuffer.cx, "y": this.textBuffer.cy});
+		let node = new SnapShotLinkedListNode(appendCommand);
+		this.insert_and_execute(node);
+	}
+	
+	tab() {
+		let appendCommand = create_Command({"command_type": "tab", "x": this.textBuffer.cx, "y": this.textBuffer.cy});
+		let node = new SnapShotLinkedListNode(appendCommand);
+		this.insert_and_execute(node);
+	}
+
+	move_cursor(offset) {
+		this.textBuffer.move(offset[0], offset[1]);
+		// According to the design, it is impossible for the cursor to extend the length of textbuffer.buffer.
+		// But it is possible for cx to extend the range of the array, detect this here
+		if (this.textBuffer.cx >= this.textBuffer.buffer[this.textBuffer.cy].length) {
+			this.textBuffer.moveToEndOfLine();
+		}
+		this.draw_cursor();
 	}
 
    
