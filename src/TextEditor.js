@@ -54,20 +54,20 @@ class TextEditor {
 			y: this.term.height,
 			default: ":"
 		}
-		this.term.fileInput(inputParameters, (error, input)=>{
+		this.term.inputField(inputParameters, (error, input)=>{
 			if(error){
 				this.term.red("errror");
 			}
 			else{
-				this.term.green("Test");
+				
+				this.execute_command(input)
 				this.commandPrompt = false;
 				this.clear_prompt()
 			}
 		})
 	}
+
 	clear_prompt(){
-		let x = this.screenBuffer.x;
-		let y = this.screenBuffer.y;
 		this.term.moveTo(0, this.term.height).eraseLine();
 		this.draw_cursor();
 	}
@@ -94,14 +94,26 @@ class TextEditor {
 	}
 
 	load_file(file, encoding='utf8', mode="w"){
-		try{
-			let text = fs.readFileSync(file, encoding, mode);
-			this.textBuffer.insert(text);
+		if(file != null){
+			try{
+				// Create new State Management Link List after opening a new file
+				// Create new text buffer for the current screen buffer
+				let text = fs.readFileSync(file, encoding, mode);
+				this.textBuffer = new termKit.TextBuffer({
+					dst: this.screenBuffer
+				})
+				this.textBuffer.setText(text);
+				this.textBuffer.moveToEndOfBuffer();
+				let init_state = new SnapShotLinkedListNode();
+				this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state,this);
+				this.file = file
+			}
+			catch(e){
+				//TODO: Add error check
+				// this.term.red("something went wrong");
+			}
 		}
-		catch(e){
-			//TODO: Add error check
-			// this.term.red("something went wrong");
-		}
+
 	}
 
 	save_file(){
@@ -126,7 +138,13 @@ class TextEditor {
 				this.backspace();
 				break;
 			case "CTRL_S":
-				if(this.file != null){this.draw_command_prompt();}
+				if(this.file != null){this.save_file();}
+				break;
+			case "CTRL_A":
+				this.save_file_as();
+				break;
+			case "CTRL_T":
+				this.draw_command_prompt();
 				break;
 			case "CTRL_C":
 				this.terminate();
@@ -293,6 +311,20 @@ class TextEditor {
 		this.draw_cursor();
 	}
 
+	execute_command(input){
+		if(input != null){
+			input = input.substring(1)
+			
+			let args = input.split(" ");
+			let command = args[0]
+			if(command == "open"){
+				this.load_file(args[1])
+			}
+		}
+
+
+
+	}
    
 
     terminate() {
