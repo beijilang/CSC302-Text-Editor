@@ -46,26 +46,26 @@ class TextEditor {
 		this.term.moveTo(pos.x, pos.y).green(' ' + message);
 	}
 
-	draw_command_prompt(){
+	draw_command_prompt(defaultString, callback){
 		this.commandPrompt = true;
 		let inputParameters = {
 			cancelable: true,
 			x: 0,
 			y: this.term.height,
-			default: ":"
+			default: defaultString
 		}
 		this.term.inputField(inputParameters, (error, input)=>{
 			if(error){
 				this.term.red("errror");
 			}
 			else{
-				
-				this.execute_command(input)
+				callback(input)
 				this.commandPrompt = false;
 				this.clear_prompt()
 			}
 		})
 	}
+	
 
 	clear_prompt(){
 		this.term.moveTo(0, this.term.height).eraseLine();
@@ -86,7 +86,7 @@ class TextEditor {
         this.textBuffer.moveTo(0,0);
         this.screenBuffer.moveTo(0,0);
         this.draw_cursor();
-		this.file = file;
+		this.filePath = file;
 		this.load_file(file)
 		let init_state = new SnapShotLinkedListNode();
 		this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state,this);
@@ -106,7 +106,7 @@ class TextEditor {
 				this.textBuffer.moveToEndOfBuffer();
 				let init_state = new SnapShotLinkedListNode();
 				this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state,this);
-				this.file = file
+				this.filePath = file
 			}
 			catch(e){
 				//TODO: Add error check
@@ -118,8 +118,7 @@ class TextEditor {
 
 	save_file(){
 		try{
-			fs.writeFileSync(this.file, this.textBuffer.getText());
-			this.term.green("\nFile Saved!");
+			fs.writeFileSync(this.filePath, this.textBuffer.getText());
 		}
 		catch(e){
 			//TODO:: Add error check
@@ -138,13 +137,18 @@ class TextEditor {
 				this.backspace();
 				break;
 			case "CTRL_S":
-				if(this.file != null){this.save_file();}
+				if(this.filePath != null){this.save_file();}
 				break;
 			case "CTRL_A":
-				this.save_file_as();
+				this.draw_command_prompt("Save File As:", (input)=>{
+					this.filePath = input.replace("Save File As:", "");
+					this.save_file();
+				})
 				break;
 			case "CTRL_T":
-				this.draw_command_prompt();
+				this.draw_command_prompt(":", (input)=>{
+					this.execute_command(input)
+				});
 				break;
 			case "CTRL_C":
 				this.terminate();
@@ -319,6 +323,12 @@ class TextEditor {
 			let command = args[0]
 			if(command == "open"){
 				this.load_file(args[1])
+			}
+			else if(command == "save"){
+				if(args.length > 1){
+					this.filePath = args[1]
+				}
+				this.save_file();
 			}
 		}
 
