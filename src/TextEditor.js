@@ -11,14 +11,14 @@ class TextEditor {
 
         this.screenBuffer = new termKit.ScreenBuffer({
 			dst: this.term,
-			height: this.term.height - 2,
+			height: this.term.height - 3,
 			y: 2
 		});
 
 		this.textBuffer = new termKit.TextBuffer({
 			dst: this.screenBuffer
 		})
-		
+		this.commandPrompt = false;
     }
 
 	onResize(width, height) {
@@ -46,6 +46,31 @@ class TextEditor {
 		this.term.moveTo(pos.x, pos.y).green(' ' + message);
 	}
 
+	draw_command_prompt(defaultString, callback){
+		this.commandPrompt = true;
+		let inputParameters = {
+			cancelable: true,
+			x: 0,
+			y: this.term.height,
+			default: defaultString
+		}
+		this.term.inputField(inputParameters, (error, input)=>{
+			if(error){
+				this.term.red("errror");
+			}
+			else{
+				callback(input)
+				this.commandPrompt = false;
+				this.clear_prompt()
+			}
+		})
+	}
+	
+
+	clear_prompt(){
+		this.term.moveTo(0, this.term.height).eraseLine();
+		this.draw_cursor();
+	}
 
 	// Init a blank terminal for write
 	init(file) {
@@ -53,13 +78,15 @@ class TextEditor {
 		this.term.grabInput( { mouse: 'button' } ) ;
 		this.term.green( 'Hit CTRL-C to quit.\n\n' );
 		this.term.on( 'key' , ( name , matches , data ) => {
-			this.handle_key_press_event(name,data)
+			if(!this.commandPrompt){
+				this.handle_key_press_event(name,data)
+			}
 		}) ;
 		this.term.on('resize', (width, height) => this.onResize(width, height));
         this.textBuffer.moveTo(0,0);
         this.screenBuffer.moveTo(0,0);
         this.draw_cursor();
-		this.file = file;
+		this.filePath = file;
 		this.load_file(file)
 		let init_state = new SnapShotLinkedListNode();
 		this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state,this);
@@ -67,20 +94,31 @@ class TextEditor {
 	}
 
 	load_file(file, encoding='utf8', mode="w"){
-		try{
-			let text = fs.readFileSync(file, encoding, mode);
-			this.textBuffer.insert(text);
+		if(file != null){
+			try{
+				// Create new State Management Link List after opening a new file
+				// Create new text buffer for the current screen buffer
+				let text = fs.readFileSync(file, encoding, mode);
+				this.textBuffer = new termKit.TextBuffer({
+					dst: this.screenBuffer
+				})
+				this.textBuffer.setText(text);
+				this.textBuffer.moveToEndOfBuffer();
+				let init_state = new SnapShotLinkedListNode();
+				this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state,this);
+				this.filePath = file
+			}
+			catch(e){
+				//TODO: Add error check
+				// this.term.red("something went wrong");
+			}
 		}
-		catch(e){
-			//TODO: Add error check
-			// this.term.red("something went wrong");
-		}
+
 	}
 
 	save_file(){
 		try{
-			fs.writeFileSync(this.file, this.textBuffer.getText());
-			this.term.green("\nFile Saved!");
+			fs.writeFileSync(this.filePath, this.textBuffer.getText());
 		}
 		catch(e){
 			//TODO:: Add error check
@@ -99,7 +137,18 @@ class TextEditor {
 				this.backspace();
 				break;
 			case "CTRL_S":
-				if(this.file != null){this.save_file();}
+				if(this.filePath != null){this.save_file();}
+				break;
+			case "CTRL_A":
+				this.draw_command_prompt("Save File As:", (input)=>{
+					this.filePath = input.replace("Save File As:", "");
+					this.save_file();
+				})
+				break;
+			case "CTRL_T":
+				this.draw_command_prompt(":", (input)=>{
+					this.execute_command(input)
+				});
 				break;
 			case "CTRL_C":
 				this.terminate();
@@ -266,6 +315,26 @@ class TextEditor {
 		this.draw_cursor();
 	}
 
+	execute_command(input){
+		if(input != null){
+			input = input.substring(1)
+			
+			let args = input.split(" ");
+			let command = args[0]
+			if(command == "open"){
+				this.load_file(args[1])
+			}
+			else if(command == "save"){
+				if(args.length > 1){
+					this.filePath = args[1]
+				}
+				this.save_file();
+			}
+		}
+
+
+
+	}
    
 
     terminate() {
