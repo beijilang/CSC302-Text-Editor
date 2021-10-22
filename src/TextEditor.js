@@ -11,14 +11,14 @@ class TextEditor {
 
         this.screenBuffer = new termKit.ScreenBuffer({
 			dst: this.term,
-			height: this.term.height - 2,
+			height: this.term.height - 3,
 			y: 2
 		});
 
 		this.textBuffer = new termKit.TextBuffer({
 			dst: this.screenBuffer
 		})
-		
+		this.commandPrompt = false;
     }
 
 	onResize(width, height) {
@@ -46,6 +46,31 @@ class TextEditor {
 		this.term.moveTo(pos.x, pos.y).green(' ' + message);
 	}
 
+	draw_command_prompt(){
+		this.commandPrompt = true;
+		let inputParameters = {
+			cancelable: true,
+			x: 0,
+			y: this.term.height,
+			default: ":"
+		}
+		this.term.fileInput(inputParameters, (error, input)=>{
+			if(error){
+				this.term.red("errror");
+			}
+			else{
+				this.term.green("Test");
+				this.commandPrompt = false;
+				this.clear_prompt()
+			}
+		})
+	}
+	clear_prompt(){
+		let x = this.screenBuffer.x;
+		let y = this.screenBuffer.y;
+		this.term.moveTo(0, this.term.height).eraseLine();
+		this.draw_cursor();
+	}
 
 	// Init a blank terminal for write
 	init(file) {
@@ -53,7 +78,9 @@ class TextEditor {
 		this.term.grabInput( { mouse: 'button' } ) ;
 		this.term.green( 'Hit CTRL-C to quit.\n\n' );
 		this.term.on( 'key' , ( name , matches , data ) => {
-			this.handle_key_press_event(name,data)
+			if(!this.commandPrompt){
+				this.handle_key_press_event(name,data)
+			}
 		}) ;
 		this.term.on('resize', (width, height) => this.onResize(width, height));
         this.textBuffer.moveTo(0,0);
@@ -99,7 +126,7 @@ class TextEditor {
 				this.backspace();
 				break;
 			case "CTRL_S":
-				if(this.file != null){this.save_file();}
+				if(this.file != null){this.draw_command_prompt();}
 				break;
 			case "CTRL_C":
 				this.terminate();
