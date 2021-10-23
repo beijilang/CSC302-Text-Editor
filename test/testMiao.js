@@ -5,7 +5,8 @@ import TextEditor from "../src/TextEditor.js";
 
 const editor = new TextEditor();
 editor.init();
-editor.set_shortcut('CTRL_Q','UNDO');
+// editor.set_shortcut('CTRL_Z','UNDO');
+// editor.set_shortcut('CTRL_Y','REDO');
 
 // import fs from 'fs';
 // var data=fs.readFileSync('../src/customization_shortcut.json', 'utf8');
@@ -16,3 +17,8 @@ editor.set_shortcut('CTRL_Q','UNDO');
 
 // }
 // console.log(customized_shortcut.get('a'))
+// var e = 'a';
+// if (e instanceof KeyboardEvent){
+//     console.log("Q")
+//   }
+  
