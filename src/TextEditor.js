@@ -8,7 +8,9 @@ import { timeStamp } from 'console';
 class TextEditor {
     constructor(input_parameter = {}) {
         this.term = termKit.terminal;
-
+		this.customized_shortcut = new Map();
+		this.available_functionality = ['REDO','UNDO','SAVE','HEAD_OF_LINE','END_OF_LINE','BACK_DELETE','TAB','SAVE_AS','COMMAND','TERMINATE','NEXT_LINE','UP','DOWN','RIGHT','LEFT','SHOW_MAPPING']
+		
         this.screenBuffer = new termKit.ScreenBuffer({
 			dst: this.term,
 			height: this.term.height - 3,
@@ -18,7 +20,14 @@ class TextEditor {
 		this.textBuffer = new termKit.TextBuffer({
 			dst: this.screenBuffer
 		})
+
+		this.tmpTextBuffer = new termKit.TextBuffer({
+			dst: this.screenBuffer
+		})
 		this.commandPrompt = false;
+		this.displayMode = false;
+		this.inputMode = "";
+		this.updateFunction = "";
     }
 
 	onResize(width, height) {
@@ -87,7 +96,26 @@ class TextEditor {
         this.screenBuffer.moveTo(0,0);
         this.draw_cursor();
 		this.filePath = file;
-		this.load_file(file)
+		this.load_file(file);
+		this.default_mapping = [{"key":"CTRL_Z","func":"UNDO"},{"key":"CTRL_S","func":"SAVE"},{"key":"CTRL_C","func":"TERMINATE"},{"key":"CTRL_Y","func":"REDO"},{"key":"ENTER","func":"NEXT_LINE"},{"key":"UP","func":"UP"},{"key":"DOWN","func":"DOWN"},{"key":"LEFT","func":"LEFT"},{"key":"RIGHT","func":"RIGHT"},{"key":"HOME","func":"HEAD_OF_LINE"},{"key":"END","func":"END_OF_LINE"},{"key":"BACKSPACE","func":"BACK_DELETE"},{"key":"TAB","func":"TAB"},{"key":"CTRL_A","func":"SAVE_AS"},{"key":"CTRL_T","func":"COMMAND"},{"key":"CTRL_Q","func":"SHOW_MAPPING"}];
+
+		try {
+			this.shortcut_file=fs.readFileSync('../src/customization_shortcut.json', 'utf8');
+		}catch(error){
+			if (error.code === 'ENOENT') {
+				const data = JSON.stringify(this.default_mapping);
+				fs.writeFileSync('../src/customization_shortcut.json', data);
+				this.shortcut_file=fs.readFileSync('../src/customization_shortcut.json', 'utf8');
+			  } else {
+				throw err;
+			  }
+		}
+		
+		this.shortcuts=JSON.parse(this.shortcut_file);
+		for (var i of this.shortcuts){
+			this.customized_shortcut.set(i['key'],i['func']);
+		}
+
 		let init_state = new SnapShotLinkedListNode();
 		this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state,this);
 
@@ -130,46 +158,108 @@ class TextEditor {
 	warning_tmp(){
 	}
 
+	set_shortcut(key,func){
+		if(!this.available_functionality.includes(func)){
+			var text = func + " functionality is not supported\n";
+			this.set_display_mode(text);
+			return;
+		}
+		
+			
+		for (var i = 0; i < this.shortcuts.length; ++i) {
+			if (this.shortcuts[i]['key'] === key) {
+				this.shortcuts[i]['key'] = undefined;
+				break;
+			}
+			
+		}
+		
+		for (var i = 0; i < this.shortcuts.length; ++i) {
+			if (this.shortcuts[i]['func'] === func) {
+				this.customized_shortcut.delete(this.shortcuts[i]['key']);
+				this.shortcuts[i]['key'] = key;
+				break;
+			}
+			
+		}
+		this.customized_shortcut.delete(key);
+		this.customized_shortcut.set(key, func);
+		
+		const data = JSON.stringify(this.shortcuts);
+		fs.writeFileSync('../src/customization_shortcut.json', data);
+	}
+
+	reset_shortcuts(){
+		const data = JSON.stringify(this.default_mapping);
+		fs.writeFileSync('../src/customization_shortcut.json', data);
+		this.shortcut_file=fs.readFileSync('../src/customization_shortcut.json', 'utf8');
+
+		this.shortcuts=JSON.parse(this.shortcut_file);
+		for (var i of this.shortcuts){
+			this.customized_shortcut.set(i['key'],i['func']);
+		}
+	}
+
 
 	handle_key_press_event(name, data) {
+		if(this.displayMode === true){
+			this.textBuffer.setText(this.tmpTextBuffer.getText());
+			this.displayMode = false;
+			this.draw_cursor();
+			return;
+		}
+
+		if(this.inputMode === "update_shortcut"){
+			console.log("A")
+			if (!data.isCharacter){
+				this.set_shortcut(name, this.updateFunction);
+				this.textBuffer.setText(this.tmpTextBuffer.getText());
+				this.inputMode = "";
+				this.draw_cursor();
+				return;
+			}
+		}
+		if (!data.isCharacter){
+			name = this.customized_shortcut.get(name);
+		}
 		switch(name) {
-			case "BACKSPACE":
+			case "BACK_DELETE":
 				this.backspace();
 				break;
-			case "CTRL_S":
+			case "SAVE":
 				if(this.filePath != null){this.save_file();}
 				break;
-			case "CTRL_A":
+			case "SAVE_AS":
 				this.draw_command_prompt("Save File As:", (input)=>{
 					this.filePath = input.replace("Save File As:", "");
 					this.save_file();
 				})
 				break;
-			case "CTRL_T":
+			case "COMMAND":
 				this.draw_command_prompt(":", (input)=>{
 					this.execute_command(input)
 				});
 				break;
-			case "CTRL_C":
+			case "TERMINATE":
 				this.terminate();
 				break;
-			case "CTRL_Z":
+			case "UNDO":
 				this.undo();
 				break;
-			case "CTRL_Y":
+			case "REDO":
 				this.redo();
 				break;
-			case 'ENTER':
+			case 'NEXT_LINE':
 				this.enter();
 				break;
 			case 'TAB':
 				this.tab();
 				break;
-			case 'HOME':
+			case 'HEAD_OF_LINE':
 				this.textBuffer.moveToColumn(0);
 				this.draw_cursor();
 				break;
-			case 'END':
+			case 'END_OF_LINE':
 				this.textBuffer.moveToEndOfLine();
 				this.draw_cursor();
 				break;
@@ -206,6 +296,13 @@ class TextEditor {
 				else {
 					this.move_cursor([1, 0]);	
 				}
+			case 'SHOW_MAPPING':
+				var mapping = "";
+				for (var i of this.shortcuts){
+					mapping += i['key'] + ' : '+ i['func'] + '\n';
+				}
+				
+				this.set_display_mode(mapping);
 			default:
 				if (data.isCharacter) {
 					this.new_char(name);
@@ -214,6 +311,23 @@ class TextEditor {
 		}
 	}
 
+	set_input_mode(text, mode){
+		
+		this.tmpTextBuffer.setText(this.textBuffer.getText());
+		
+		this.textBuffer.setText(text);
+		this.inputMode = mode;
+		this.draw_cursor();
+	}
+
+	set_display_mode(text){
+		text += "Press any key to return";
+		this.tmpTextBuffer.setText(this.textBuffer.getText());
+		
+		this.textBuffer.setText(text);
+		this.displayMode = true;
+		this.draw_cursor();
+	}
 	get_char_at_location(x, y) {
 		if (x == 0) {
 			let last_index = this.textBuffer.buffer[y - 1].length - 1
@@ -329,6 +443,21 @@ class TextEditor {
 					this.filePath = args[1]
 				}
 				this.save_file();
+			}else if(command == "change_shortcut"){
+				if(args.length > 2){
+					var key = args[1];
+					var func = args[2];
+					this.set_shortcut(key,func);
+				}
+			}else if (command == "update_shortcut"){
+				if(args.length > 1){
+					this.inputMode = "update_shortcut";
+					this.updateFunction = args[1];
+					this.set_input_mode("Press a non-character key to update shortcut","update_shortcut");
+				}
+			}
+			else if(command == "reset_shortcuts"){
+				this.reset_shortcuts();
 			}
 		}
 
