@@ -22,13 +22,22 @@
 
 Adding more basic editor features
 
-* 
+* Cursor movement
+* Delete and back-delete
+* Draw cursor
+* Save as
+* Command prompt
+* Customized shortcuts
 
 Team member's responsibilities:
 
 * Yujie
   * Update cursor position with shortcut key (HOME, END, ENTER, TAB) (done)
-  * Update cursor position with shortcut key (PAGE_UP, PAGE_DOWN, CTRL_LEFT, CTRL_RIGHT,UP,LEFT,DOWN, RIGHT)
+  * Update cursor position with shortcut key (PAGE_UP, PAGE_DOWN ,UP,LEFT,DOWN, RIGHT) (done)
+  * Customized shortcut
+    * Able to adjust shortcut key using terminal prompt and js script (done)
+    * Able to reset all shortcuts (done)
+    * Able to display shortcut mapping in terminal (done)
 * Tony:
   * Backspace (done)
   * Delete
