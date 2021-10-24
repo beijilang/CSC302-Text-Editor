@@ -1,1 +1,17 @@
-[{"key":"CTRL_Z","func":"UNDO"},{"key":"CTRL_S","func":"SAVE"},{"key":"CTRL_C","func":"TERMINATE"},{"key":"CTRL_Y","func":"REDO"},{"key":"ENTER","func":"NEXT_LINE"},{"key":"UP","func":"UP"},{"key":"DOWN","func":"DOWN"},{"key":"LEFT","func":"LEFT"},{"key":"RIGHT","func":"RIGHT"},{"key":"HOME","func":"HEAD_OF_LINE"},{"key":"END","func":"END_OF_LINE"},{"key":"BACKSPACE","func":"BACK_DELETE"},{"key":"TAB","func":"TAB"},{"key":"CTRL_A","func":"SAVE_AS"},{"key":"CTRL_T","func":"COMMAND"},{"key":"CTRL_Q","func":"SHOW_MAPPING"}]
+[{"key":"CTRL_Z","func":"UNDO"},
+{"key":"CTRL_S","func":"SAVE"},
+{"key":"CTRL_C","func":"TERMINATE"},
+{"key":"CTRL_Y","func":"REDO"},
+{"key":"ENTER","func":"NEXT_LINE"},
+{"key":"UP","func":"UP"},
+{"key":"DOWN","func":"DOWN"},
+{"key":"LEFT","func":"LEFT"},
+{"key":"RIGHT","func":"RIGHT"},
+{"key":"HOME","func":"HEAD_OF_LINE"},
+{"key":"END","func":"END_OF_LINE"},
+{"key":"BACKSPACE","func":"BACK_DELETE"},
+{"key":"TAB","func":"TAB"},
+{"key":"CTRL_A","func":"SAVE_AS"},
+{"key":"CTRL_T","func":"COMMAND"},
+{"key":"CTRL_Q","func":"SHOW_MAPPING"},
+{"key":"CTRL_F", "func": "FIND_AND_REPLACE"}]

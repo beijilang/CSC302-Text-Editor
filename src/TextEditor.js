@@ -9,7 +9,7 @@ class TextEditor {
     constructor(input_parameter = {}) {
         this.term = termKit.terminal;
 		this.customized_shortcut = new Map();
-		this.available_functionality = ['REDO','UNDO','SAVE','HEAD_OF_LINE','END_OF_LINE','BACK_DELETE','TAB','SAVE_AS','COMMAND','TERMINATE','NEXT_LINE','UP','DOWN','RIGHT','LEFT','SHOW_MAPPING']
+		this.available_functionality = ['REDO','UNDO','SAVE','HEAD_OF_LINE','END_OF_LINE','BACK_DELETE','TAB','SAVE_AS', 'FIND_AND_REPLACE', 'COMMAND','TERMINATE','NEXT_LINE','UP','DOWN','RIGHT','LEFT','SHOW_MAPPING']
 		
         this.screenBuffer = new termKit.ScreenBuffer({
 			dst: this.term,
@@ -27,8 +27,25 @@ class TextEditor {
 		this.commandPrompt = false;
 		this.displayMode = false;
 		this.inputMode = "";
-		this.updateFunction = "";
+		// We use this variable to check if we are trying to find and replace
+		this.find_and_replace_related = {
+			all_occurence_index: [],
+			in_find_and_replace: false,
+			current_index: 0,
+			input_search: "",
+			replace_by: ""
+		}
+		
     }
+
+	display_no_match_found_message_at_top() {
+		this.drawRedBar({x:1, y:1}, "No Match Found!!");
+		this.draw_cursor();
+		setTimeout(() => {
+			this.drawBar({x:1, y:1},'Hit CTRL-C to quit.\n\n');
+			this.draw_cursor();
+		}, 3000);
+	}
 
 	onResize(width, height) {
 		this.screenBuffer.resize({
@@ -54,6 +71,12 @@ class TextEditor {
 	drawBar(pos, message) {
 		this.term.moveTo(pos.x, pos.y).green(' ' + message);
 	}
+	
+	drawRedBar(pos, message) {
+		this.term.moveTo(pos.x, pos.y);
+		this.term.eraseLine();
+		this.term.red(' ' + message);
+	}
 
 	draw_command_prompt(defaultString, callback){
 		this.commandPrompt = true;
@@ -61,7 +84,8 @@ class TextEditor {
 			cancelable: true,
 			x: 0,
 			y: this.term.height,
-			default: defaultString
+			default: defaultString,
+			cancelable: true
 		}
 		this.term.inputField(inputParameters, (error, input)=>{
 			if(error){
@@ -97,7 +121,7 @@ class TextEditor {
         this.draw_cursor();
 		this.filePath = file;
 		this.load_file(file);
-		this.default_mapping = [{"key":"CTRL_Z","func":"UNDO"},{"key":"CTRL_S","func":"SAVE"},{"key":"CTRL_C","func":"TERMINATE"},{"key":"CTRL_Y","func":"REDO"},{"key":"ENTER","func":"NEXT_LINE"},{"key":"UP","func":"UP"},{"key":"DOWN","func":"DOWN"},{"key":"LEFT","func":"LEFT"},{"key":"RIGHT","func":"RIGHT"},{"key":"HOME","func":"HEAD_OF_LINE"},{"key":"END","func":"END_OF_LINE"},{"key":"BACKSPACE","func":"BACK_DELETE"},{"key":"TAB","func":"TAB"},{"key":"CTRL_A","func":"SAVE_AS"},{"key":"CTRL_T","func":"COMMAND"},{"key":"CTRL_Q","func":"SHOW_MAPPING"}];
+		this.default_mapping = [{"key":"CTRL_Z","func":"UNDO"}, {"key": "CTRL_F", "func": "FIND_AND_REPLACE"}, {"key":"CTRL_S","func":"SAVE"},{"key":"CTRL_C","func":"TERMINATE"},{"key":"CTRL_Y","func":"REDO"},{"key":"ENTER","func":"NEXT_LINE"},{"key":"UP","func":"UP"},{"key":"DOWN","func":"DOWN"},{"key":"LEFT","func":"LEFT"},{"key":"RIGHT","func":"RIGHT"},{"key":"HOME","func":"HEAD_OF_LINE"},{"key":"END","func":"END_OF_LINE"},{"key":"BACKSPACE","func":"BACK_DELETE"},{"key":"TAB","func":"TAB"},{"key":"CTRL_A","func":"SAVE_AS"},{"key":"CTRL_T","func":"COMMAND"},{"key":"CTRL_Q","func":"SHOW_MAPPING"}];
 
 		try {
 			this.shortcut_file=fs.readFileSync('../src/customization_shortcut.json', 'utf8');
@@ -142,6 +166,13 @@ class TextEditor {
 			}
 		}
 
+	}
+
+	locate_next_occurence() {
+		let current_index = this.find_and_replace_related.current_index;
+		let actual_index = current_index % this.find_and_replace_related.all_occurence_index.length;
+		this.find_and_replace_related.current_index += 1;
+		return this.find_and_replace_related.all_occurence_index[actual_index];
 	}
 
 	save_file(){
@@ -200,6 +231,13 @@ class TextEditor {
 		}
 	}
 
+	show_next_find_result() {
+		this.find_all_occurence_of_input(this.find_and_replace_related.input_search);
+		const next_occurence = this.locate_next_occurence();
+		this.textBuffer.moveTo(next_occurence[1], next_occurence[0])
+		this.draw_cursor();
+	}
+
 
 	handle_key_press_event(name, data) {
 		if(this.displayMode === true){
@@ -210,7 +248,6 @@ class TextEditor {
 		}
 
 		if(this.inputMode === "update_shortcut"){
-			console.log("A")
 			if (!data.isCharacter){
 				this.set_shortcut(name, this.updateFunction);
 				this.textBuffer.setText(this.tmpTextBuffer.getText());
@@ -235,6 +272,23 @@ class TextEditor {
 					this.save_file();
 				})
 				break;
+			case "FIND_AND_REPLACE":
+				this.prompt
+				this.draw_command_prompt("Find:", (input) => {
+					if (typeof input != 'undefined') {
+						this.find_all_occurence_of_input(input);
+						this.find_and_replace_related.input_search = input.replace("Find:", "");
+						if (this.find_and_replace_related.all_occurence_index.length == 0) {
+							this.display_no_match_found_message_at_top();
+						}
+						else {
+							this.find_and_replace_related.current_index = 0;
+							this.find_and_replace_related.in_find_and_replace = true;
+							this.show_next_find_result();
+						}
+					}
+				})
+				break;
 			case "COMMAND":
 				this.draw_command_prompt(":", (input)=>{
 					this.execute_command(input)
@@ -250,7 +304,12 @@ class TextEditor {
 				this.redo();
 				break;
 			case 'NEXT_LINE':
-				this.enter();
+				if (this.find_and_replace_related.in_find_and_replace) {
+					this.show_next_find_result();
+				}
+				else {
+					this.enter();
+				}
 				break;
 			case 'TAB':
 				this.tab();
@@ -296,13 +355,14 @@ class TextEditor {
 				else {
 					this.move_cursor([1, 0]);	
 				}
+				break;
 			case 'SHOW_MAPPING':
 				var mapping = "";
 				for (var i of this.shortcuts){
 					mapping += i['key'] + ' : '+ i['func'] + '\n';
 				}
-				
 				this.set_display_mode(mapping);
+				break;
 			default:
 				if (data.isCharacter) {
 					this.new_char(name);
@@ -311,7 +371,27 @@ class TextEditor {
 		}
 	}
 
-	set_input_mode(text, mode){
+	find_all_occurence_of_input(input) {
+		const word_looking_for = input.replace("Find:", "");
+		const current_text_buffer = this.textBuffer.buffer;
+		let all_occurence_index = [];
+		for (let i = 0; i < current_text_buffer.length; i++) {
+			if (current_text_buffer[i].length < word_looking_for.length) {
+				continue;
+			}
+			else {
+				for (let j = 0; j <= current_text_buffer[i].length - word_looking_for.length; j++) {
+					const cur_word = current_text_buffer[i].slice(j, j + word_looking_for.length).map(item => item.char).join("");
+					if (cur_word.toLocaleLowerCase().localeCompare(word_looking_for.toLocaleLowerCase()) == 0) {
+						all_occurence_index.push([i, j]);
+					}
+				}
+			}
+		}
+		this.find_and_replace_related.all_occurence_index = all_occurence_index;
+	}
+
+	set_input_mode(text, mode) {
 		
 		this.tmpTextBuffer.setText(this.textBuffer.getText());
 		
