@@ -85,7 +85,6 @@ class DeleteCommand {
         this.x = TextEditorObj.textBuffer.cx;
         this.y = TextEditorObj.textBuffer.cy;
         TextEditorObj.draw_cursor();
-        
     }
 }
 

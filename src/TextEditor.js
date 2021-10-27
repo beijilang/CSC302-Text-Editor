@@ -345,7 +345,6 @@ class TextEditor {
                 break;
             case "UP":
                 if (this.textBuffer.cy == 0) {
-
                 } else {
                     // Move curosr [vertical offset, horizontal offset]
                     this.move_cursor([0, -1]);
@@ -354,14 +353,12 @@ class TextEditor {
             case "DOWN":
                 // If at last line just return
                 if (this.textBuffer.cy == this.textBuffer.buffer.length - 1) {
-
                 } else {
                     this.move_cursor([0, 1]);
                 }
                 break;
             case "LEFT":
                 if (this.textBuffer.cy == 0 && this.textBuffer.cx == 0) {
-
                 } else {
                     this.move_cursor([-1, 0]);
                 }
@@ -371,7 +368,6 @@ class TextEditor {
                     this.textBuffer.cy == this.textBuffer.buffer.length - 1 &&
                     this.textBuffer.cx == this.textBuffer.buffer[this.textBuffer.buffer.length - 1].length
                 ) {
-
                 } else {
                     this.move_cursor([1, 0]);
                 }
@@ -493,7 +489,6 @@ class TextEditor {
     backspace() {
         /* Check Cursor Location First */
         if (this.textBuffer.cx == 0 && this.textBuffer.cy == 0) {
-
         } else {
             const DeleteCommand = create_Command({
                 command_type: "delete",
