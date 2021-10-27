@@ -1,12 +1,10 @@
 // Initialize class that has the same structure as the above to make changes. For exmaple, when appending, should Init AppendCommand,
 // And initialize it with the append index and content;
 
-
 class EnterCommand {
     constructor(x, y, c_type) {
         this.c_type = c_type;
     }
-
 
     execute(TextEditorObj) {
         TextEditorObj.textBuffer.newLine();
@@ -20,7 +18,7 @@ class EnterCommand {
         this.x = TextEditorObj.textBuffer.cx;
         this.y = TextEditorObj.textBuffer.cy;
         TextEditorObj.draw_cursor();
-    } 
+    }
 }
 
 class TabCommand {
@@ -31,7 +29,7 @@ class TabCommand {
     }
 
     execute(TextEditorObj) {
-        TextEditorObj.textBuffer.insert('\t');
+        TextEditorObj.textBuffer.insert("\t");
         this.undo_x = TextEditorObj.textBuffer.cx;
         this.undo_y = TextEditorObj.textBuffer.cy;
         TextEditorObj.draw_cursor();
@@ -42,7 +40,7 @@ class TabCommand {
         this.x = TextEditorObj.textBuffer.cx;
         this.y = TextEditorObj.textBuffer.cy;
         TextEditorObj.draw_cursor();
-    } 
+    }
 }
 
 class TextCommand {
@@ -63,7 +61,7 @@ class TextCommand {
         this.x = TextEditorObj.textBuffer.cx;
         this.y = TextEditorObj.textBuffer.cy;
         TextEditorObj.draw_cursor();
-    } 
+    }
 }
 
 class DeleteCommand {
@@ -73,7 +71,7 @@ class DeleteCommand {
         this.c_type = c_type;
     }
 
-    execute(TextEditorObj){
+    execute(TextEditorObj) {
         let obj = TextEditorObj.get_char_at_location(this.x, this.y);
         this.deleted_char = obj.char;
         TextEditorObj.textBuffer.backDelete(1);
@@ -90,6 +88,5 @@ class DeleteCommand {
     }
 }
 
-
 // Call export here
-export {DeleteCommand, TextCommand, EnterCommand,TabCommand};
+export { DeleteCommand, TextCommand, EnterCommand, TabCommand };

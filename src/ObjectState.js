@@ -1,4 +1,4 @@
-import {assert} from './util.js'
+import { assert } from "./util.js";
 
 class SnapShotLinkedListNode {
     constructor(textEditorCommandObject = null) {
@@ -17,7 +17,7 @@ class TextEditorStateManagementLinkList {
 
     error_check() {
         if (this.cur_node == null) {
-            assert(false, "TAIL AND HEAD EMPTY")
+            assert(false, "TAIL AND HEAD EMPTY");
         }
     }
 
@@ -60,6 +60,4 @@ class TextEditorStateManagementLinkList {
     // Apply the redo Action.
 }
 
-
-export {SnapShotLinkedListNode, TextEditorStateManagementLinkList};
-
+export { SnapShotLinkedListNode, TextEditorStateManagementLinkList };

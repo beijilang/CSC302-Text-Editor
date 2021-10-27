@@ -6,9 +6,14 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src",
-    "test": "node test/test.js"
+    "test": "node test/test.js",
+    "format": "prettier --write src test",
+    "check-format": "prettier --check src test"
   },
   "dependencies": {
     "terminal-kit": "^2.1.8"
+  },
+  "devDependencies": {
+    "prettier": "2.4.1"
   }
 }
