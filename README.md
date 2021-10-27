@@ -24,10 +24,6 @@ npm start
 npm test
 ```
 
-
-
-
-
 ## Keymap
 
 | KEY    | ACTION                |
@@ -39,8 +35,6 @@ npm test
 | Ctrl+C | Terminate             |
 | Ctrl+Q | Show shortcut mapping |
 | Ctrl+T | Open command prompt   |
-
-
 
 ### Supported command in command prompt
 

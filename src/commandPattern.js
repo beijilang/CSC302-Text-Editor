@@ -72,19 +72,20 @@ class DeleteCommand {
     }
 
     execute(TextEditorObj) {
-        let obj = TextEditorObj.get_char_at_location(this.x, this.y);
+        const obj = TextEditorObj.get_char_at_location(this.x, this.y);
         this.deleted_char = obj.char;
         TextEditorObj.textBuffer.backDelete(1);
         this.undo_x = TextEditorObj.textBuffer.cx;
         this.undo_y = TextEditorObj.textBuffer.cy;
         TextEditorObj.draw_cursor();
     }
+
     redo(TextEditorObj) {
         TextEditorObj.textBuffer.insert(this.deleted_char);
         this.x = TextEditorObj.textBuffer.cx;
         this.y = TextEditorObj.textBuffer.cy;
         TextEditorObj.draw_cursor();
-        return;
+        
     }
 }
 

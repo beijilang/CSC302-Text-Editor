@@ -2,8 +2,6 @@ import { create_Command } from "./util.js";
 import termKit from "terminal-kit";
 import * as fs from "fs";
 import { SnapShotLinkedListNode, TextEditorStateManagementLinkList } from "./ObjectState.js";
-import { timingSafeEqual } from "crypto";
-import { timeStamp } from "console";
 
 class TextEditor {
     constructor(input_parameter = {}) {
@@ -96,7 +94,7 @@ class TextEditor {
 
     draw_command_prompt(defaultString, callback) {
         this.commandPrompt = true;
-        let inputParameters = {
+        const inputParameters = {
             cancelable: true,
             x: 0,
             y: this.term.height,
@@ -168,11 +166,11 @@ class TextEditor {
         }
 
         this.shortcuts = JSON.parse(this.shortcut_file);
-        for (var i of this.shortcuts) {
-            this.customized_shortcut.set(i["key"], i["func"]);
+        for (const i of this.shortcuts) {
+            this.customized_shortcut.set(i.key, i.func);
         }
 
-        let init_state = new SnapShotLinkedListNode();
+        const init_state = new SnapShotLinkedListNode();
         this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state, this);
     }
 
@@ -181,25 +179,25 @@ class TextEditor {
             try {
                 // Create new State Management Link List after opening a new file
                 // Create new text buffer for the current screen buffer
-                let text = fs.readFileSync(file, encoding, mode);
+                const text = fs.readFileSync(file, encoding, mode);
                 this.textBuffer = new termKit.TextBuffer({
                     dst: this.screenBuffer,
                 });
                 this.textBuffer.setText(text);
                 this.textBuffer.moveToEndOfBuffer();
-                let init_state = new SnapShotLinkedListNode();
+                const init_state = new SnapShotLinkedListNode();
                 this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state, this);
                 this.filePath = file;
             } catch (e) {
-                //TODO: Add error check
+                // TODO: Add error check
                 // this.term.red("something went wrong");
             }
         }
     }
 
     locate_next_occurence() {
-        let current_index = this.find_and_replace_related.current_index;
-        let actual_index = current_index % this.find_and_replace_related.all_occurence_index.length;
+        const current_index = this.find_and_replace_related.current_index;
+        const actual_index = current_index % this.find_and_replace_related.all_occurence_index.length;
         this.find_and_replace_related.current_index += 1;
         return this.find_and_replace_related.all_occurence_index[actual_index];
     }
@@ -208,7 +206,7 @@ class TextEditor {
         try {
             fs.writeFileSync(this.filePath, this.textBuffer.getText());
         } catch (e) {
-            //TODO:: Add error check
+            // TODO:: Add error check
             // this.term.red("Something went wrong");
         }
     }
@@ -218,22 +216,22 @@ class TextEditor {
 
     set_shortcut(key, func) {
         if (!this.available_functionality.includes(func)) {
-            var text = func + " functionality is not supported\n";
+            const text = func + " functionality is not supported\n";
             this.set_display_mode(text);
             return;
         }
 
         for (var i = 0; i < this.shortcuts.length; ++i) {
-            if (this.shortcuts[i]["key"] === key) {
-                this.shortcuts[i]["key"] = undefined;
+            if (this.shortcuts[i].key === key) {
+                this.shortcuts[i].key = undefined;
                 break;
             }
         }
 
         for (var i = 0; i < this.shortcuts.length; ++i) {
-            if (this.shortcuts[i]["func"] === func) {
-                this.customized_shortcut.delete(this.shortcuts[i]["key"]);
-                this.shortcuts[i]["key"] = key;
+            if (this.shortcuts[i].func === func) {
+                this.customized_shortcut.delete(this.shortcuts[i].key);
+                this.shortcuts[i].key = key;
                 break;
             }
         }
@@ -250,8 +248,8 @@ class TextEditor {
         this.shortcut_file = fs.readFileSync("../src/customization_shortcut.json", "utf8");
 
         this.shortcuts = JSON.parse(this.shortcut_file);
-        for (var i of this.shortcuts) {
-            this.customized_shortcut.set(i["key"], i["func"]);
+        for (const i of this.shortcuts) {
+            this.customized_shortcut.set(i.key, i.func);
         }
     }
 
@@ -300,7 +298,7 @@ class TextEditor {
             case "FIND_AND_REPLACE":
                 this.prompt;
                 this.draw_command_prompt("Find:", (input) => {
-                    if (typeof input != "undefined") {
+                    if (typeof input !== "undefined") {
                         this.find_all_occurence_of_input(input);
                         this.find_and_replace_related.input_search = input.replace("Find:", "");
                         if (this.find_and_replace_related.all_occurence_index.length == 0) {
@@ -347,7 +345,7 @@ class TextEditor {
                 break;
             case "UP":
                 if (this.textBuffer.cy == 0) {
-                    return;
+
                 } else {
                     // Move curosr [vertical offset, horizontal offset]
                     this.move_cursor([0, -1]);
@@ -356,14 +354,14 @@ class TextEditor {
             case "DOWN":
                 // If at last line just return
                 if (this.textBuffer.cy == this.textBuffer.buffer.length - 1) {
-                    return;
+
                 } else {
                     this.move_cursor([0, 1]);
                 }
                 break;
             case "LEFT":
                 if (this.textBuffer.cy == 0 && this.textBuffer.cx == 0) {
-                    return;
+
                 } else {
                     this.move_cursor([-1, 0]);
                 }
@@ -373,15 +371,15 @@ class TextEditor {
                     this.textBuffer.cy == this.textBuffer.buffer.length - 1 &&
                     this.textBuffer.cx == this.textBuffer.buffer[this.textBuffer.buffer.length - 1].length
                 ) {
-                    return;
+
                 } else {
                     this.move_cursor([1, 0]);
                 }
                 break;
             case "SHOW_MAPPING":
                 var mapping = "";
-                for (var i of this.shortcuts) {
-                    mapping += i["key"] + " : " + i["func"] + "\n";
+                for (const i of this.shortcuts) {
+                    mapping += i.key + " : " + i.func + "\n";
                 }
                 this.set_display_mode(mapping);
                 break;
@@ -396,7 +394,7 @@ class TextEditor {
     find_all_occurence_of_input(input) {
         const word_looking_for = input.replace("Find:", "");
         const current_text_buffer = this.textBuffer.buffer;
-        let all_occurence_index = [];
+        const all_occurence_index = [];
         for (let i = 0; i < current_text_buffer.length; i++) {
             if (current_text_buffer[i].length < word_looking_for.length) {
                 continue;
@@ -431,9 +429,10 @@ class TextEditor {
         this.displayMode = true;
         this.draw_cursor();
     }
+
     get_char_at_location(x, y) {
         if (x == 0) {
-            let last_index = this.textBuffer.buffer[y - 1].length - 1;
+            const last_index = this.textBuffer.buffer[y - 1].length - 1;
             return this.textBuffer.buffer[y - 1][last_index];
         } else {
             return this.textBuffer.buffer[y][x - 1];
@@ -466,7 +465,7 @@ class TextEditor {
     }
 
     undo() {
-        let prev_state = this.TextEditorStateManagementLinkList.get_last_action();
+        const prev_state = this.TextEditorStateManagementLinkList.get_last_action();
         if (prev_state == null) {
             return;
         }
@@ -475,7 +474,7 @@ class TextEditor {
     }
 
     redo() {
-        let next_state = this.TextEditorStateManagementLinkList.get_next_action();
+        const next_state = this.TextEditorStateManagementLinkList.get_next_action();
         if (next_state == null) {
             return;
         }
@@ -494,38 +493,38 @@ class TextEditor {
     backspace() {
         /* Check Cursor Location First */
         if (this.textBuffer.cx == 0 && this.textBuffer.cy == 0) {
-            return;
+
         } else {
-            let DeleteCommand = create_Command({
+            const DeleteCommand = create_Command({
                 command_type: "delete",
                 x: this.textBuffer.cx,
                 y: this.textBuffer.cy,
             });
-            let node = new SnapShotLinkedListNode(DeleteCommand);
+            const node = new SnapShotLinkedListNode(DeleteCommand);
             this.insert_and_execute(node);
         }
     }
 
     new_char(char) {
-        let appendCommand = create_Command({
+        const appendCommand = create_Command({
             command_type: "text",
             text: char,
             x: this.textBuffer.cx,
             y: this.textBuffer.cy,
         });
-        let node = new SnapShotLinkedListNode(appendCommand);
+        const node = new SnapShotLinkedListNode(appendCommand);
         this.insert_and_execute(node);
     }
 
     enter() {
-        let appendCommand = create_Command({ command_type: "enter", x: this.textBuffer.cx, y: this.textBuffer.cy });
-        let node = new SnapShotLinkedListNode(appendCommand);
+        const appendCommand = create_Command({ command_type: "enter", x: this.textBuffer.cx, y: this.textBuffer.cy });
+        const node = new SnapShotLinkedListNode(appendCommand);
         this.insert_and_execute(node);
     }
 
     tab() {
-        let appendCommand = create_Command({ command_type: "tab", x: this.textBuffer.cx, y: this.textBuffer.cy });
-        let node = new SnapShotLinkedListNode(appendCommand);
+        const appendCommand = create_Command({ command_type: "tab", x: this.textBuffer.cx, y: this.textBuffer.cy });
+        const node = new SnapShotLinkedListNode(appendCommand);
         this.insert_and_execute(node);
     }
 
@@ -543,8 +542,8 @@ class TextEditor {
         if (input != null) {
             input = input.substring(1);
 
-            let args = input.split(" ");
-            let command = args[0];
+            const args = input.split(" ");
+            const command = args[0];
             if (command == "open") {
                 this.load_file(args[1]);
             } else if (command == "save") {
@@ -554,8 +553,8 @@ class TextEditor {
                 this.save_file();
             } else if (command == "change_shortcut") {
                 if (args.length > 2) {
-                    var key = args[1];
-                    var func = args[2];
+                    const key = args[1];
+                    const func = args[2];
                     this.set_shortcut(key, func);
                 }
             } else if (command == "update_shortcut") {

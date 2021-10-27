@@ -7,6 +7,8 @@
   "scripts": {
     "start": "node src",
     "test": "node test/test.js",
+    "fix-lint": "eslint --fix src test",
+    "lint": "eslint src test",
     "format": "prettier --write src test",
     "check-format": "prettier --check src test"
   },
@@ -14,6 +16,27 @@
     "terminal-kit": "^2.1.8"
   },
   "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.1",
     "prettier": "2.4.1"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "es2021": true,
+      "node": true
+    },
+    "extends": [
+      "standard",
+      "prettier"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 12,
+      "sourceType": "module"
+    }
   }
 }

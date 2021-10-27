@@ -2,4 +2,4 @@
 
 import TextEditor from "./TextEditor.js";
 
-let text_editor = new TextEditor();
+const text_editor = new TextEditor();
