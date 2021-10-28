@@ -40,13 +40,26 @@
 - Re-arranged milestones
   - We had to implement redo and undo feature for every other features, so it can't be an individual milestone
 
-
-
-
-
 ## Oct 7
 
 - Meeting with the TA
   - Went over our A1 contribution
   - Discuss about our next step, we need to re-arrange our milestone
 - Realized cursor position is a problem, sometimes it's not in the correct position
+
+## Oct 14
+
+- TA meeting
+  - Kevin joins
+
+## Oct 21
+
+- TA meeting
+  - Tony, Kevin present
+
+## Oct 27
+
+- All milestones done except copy and paste
+- Waiting on copy and paste and we want to meet with Greg
+- Merging in ESLint/Prettier PR
+- Backspace is working, delete is not
