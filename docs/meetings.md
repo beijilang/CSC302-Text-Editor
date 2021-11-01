@@ -63,3 +63,17 @@
 - Waiting on copy and paste and we want to meet with Greg
 - Merging in ESLint/Prettier PR
 - Backspace is working, delete is not
+  
+## Oct 28
+
+- TA meeting
+  - General progress checkup
+
+## Nov 1
+
+- Meeting with greg, discuss progress so far and milestone 3
+- Additional features to implement for milestone 3
+  - Record and Repeat keystroke
+  - Repeat operation
+  - Find matching parentheses
+
