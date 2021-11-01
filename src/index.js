@@ -2,4 +2,5 @@
 
 import TextEditor from "./TextEditor.js";
 
-const text_editor = new TextEditor();
+const editor = new TextEditor();
+editor.init(process.argv[2]);
