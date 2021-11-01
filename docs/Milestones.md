@@ -27,6 +27,9 @@ Adding more basic editor features
 * Draw cursor
 * Save as
 * Command prompt
+* Redo/Undo
+* Copy/Paste
+* Find/Replace
 * Customized shortcuts
 
 Team member's responsibilities:
@@ -39,21 +42,24 @@ Team member's responsibilities:
     * Able to reset all shortcuts (done)
     * Able to display shortcut mapping in terminal (done)
 * Tony:
-  * Backspace (done)
-  * Delete
-  * Draw cursor
+  * Find and replace (done find)
+  * Redo/Undo for basic operations (done)
 * David:
-  * Save
-  * Save as
-  * Save and exit
+  * Save (done)
+  * Save as (done)
+  * Save and exit (done)
+  * Open (done)
+  * Vim style command prompt (done)
 * Kevin:
+  * Copy and paste (done)
 
 ## Milestone 3
 
 Adding advanced feature:
 
-- Copy and paste
-- Find and replace
+- Record and Repeat keystroke
+- Repeat operation
+- Find matching parentheses
 
 Team member's responsibilities:
 
