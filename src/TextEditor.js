@@ -25,6 +25,8 @@ class TextEditor {
             "RIGHT",
             "LEFT",
             "SHOW_MAPPING",
+            "HIGHLIGHT_LEFT",
+            "HIGHLIGHT_RIGHT"
         ];
 
         this.screenBuffer = new termKit.ScreenBuffer({
@@ -51,6 +53,10 @@ class TextEditor {
             input_search: "",
             replace_by: "",
         };
+
+        this.highlightRow = null;
+        this.highlightStart = null;
+        this.highlightEnd = null;
     }
 
     display_no_match_found_message_at_top() {
@@ -151,17 +157,19 @@ class TextEditor {
             { key: "CTRL_A", func: "SAVE_AS" },
             { key: "CTRL_T", func: "COMMAND" },
             { key: "CTRL_Q", func: "SHOW_MAPPING" },
+            { key: "SHIFT_LEFT", func: "HIGHLIGHT_LEFT" },
+            { key: "SHIFT_RIGHT", func: "HIGHLIGHT_RIGHT" },
         ];
 
         try {
-            this.shortcut_file = fs.readFileSync("../src/customization_shortcut.json", "utf8");
+            this.shortcut_file = fs.readFileSync("./.editorrc", "utf8");
         } catch (error) {
             if (error.code === "ENOENT") {
                 const data = JSON.stringify(this.default_mapping);
-                fs.writeFileSync("../src/customization_shortcut.json", data);
-                this.shortcut_file = fs.readFileSync("../src/customization_shortcut.json", "utf8");
+                fs.writeFileSync("./.editorrc", data);
+                this.shortcut_file = fs.readFileSync("./.editorrc", "utf8");
             } else {
-                throw err;
+                throw error;
             }
         }
 
@@ -211,9 +219,6 @@ class TextEditor {
         }
     }
 
-    // This is just a temp method for logging out something went wrong.
-    warning_tmp() {}
-
     set_shortcut(key, func) {
         if (!this.available_functionality.includes(func)) {
             const text = func + " functionality is not supported\n";
@@ -239,13 +244,13 @@ class TextEditor {
         this.customized_shortcut.set(key, func);
 
         const data = JSON.stringify(this.shortcuts);
-        fs.writeFileSync("../src/customization_shortcut.json", data);
+        fs.writeFileSync("./.editorrc", data);
     }
 
     reset_shortcuts() {
         const data = JSON.stringify(this.default_mapping);
-        fs.writeFileSync("../src/customization_shortcut.json", data);
-        this.shortcut_file = fs.readFileSync("../src/customization_shortcut.json", "utf8");
+        fs.writeFileSync("./.editorrc", data);
+        this.shortcut_file = fs.readFileSync("./.editorrc", "utf8");
 
         this.shortcuts = JSON.parse(this.shortcut_file);
         for (const i of this.shortcuts) {
@@ -279,6 +284,9 @@ class TextEditor {
         }
         if (!data.isCharacter) {
             name = this.customized_shortcut.get(name);
+        }
+        if (name !== "HIGHLIGHT_LEFT" && name !== "HIGHLIGHT_RIGHT") {
+            this.cancelHighlight();
         }
         switch (name) {
             case "BACK_DELETE":
@@ -379,12 +387,55 @@ class TextEditor {
                 }
                 this.set_display_mode(mapping);
                 break;
+            case "HIGHLIGHT_LEFT":
+                this.highlightLeft();
+                break;
+            case "HIGHLIGHT_RIGHT":
+                this.highlightRight();
+                break;
             default:
                 if (data.isCharacter) {
                     this.new_char(name);
                 }
                 break;
         }
+    }
+
+    cancelHighlight() {
+        this.textBuffer.setAttrRegion({ inverse: false });
+        this.highlightRow = null;
+        this.highlightStart = null;
+        this.highlightEnd = null;
+    }
+
+    highlightLeft() {
+        if (this.textBuffer.cx > 0) {
+            const newStart = this.textBuffer.cx - 1;
+            this.highlightRow = this.textBuffer.cy;
+            if (this.highlightEnd === null || this.highlightEnd < newStart) {
+                this.highlightEnd = newStart;
+            }
+            if (this.highlightStart === null || this.highlightStart > newStart) {
+                this.highlightStart = newStart;
+            }
+            this.textBuffer.setAttrAt({ inverse: true }, newStart, this.textBuffer.cy);
+        }
+        this.move_cursor([-1, 0]);
+    }
+
+    highlightRight() {
+        if (this.textBuffer.cx < this.textBuffer.buffer[this.textBuffer.cy].length) {
+            const newEnd = this.textBuffer.cx;
+            this.highlightRow = this.textBuffer.cy;
+            if (this.highlightEnd === null || this.highlightEnd < newEnd) {
+                this.highlightEnd = newEnd;
+            }
+            if (this.highlightStart === null || this.highlightStart > newEnd) {
+                this.highlightStart = newEnd;
+            }
+            this.textBuffer.setAttrAt({ inverse: true }, this.textBuffer.cx, this.textBuffer.cy);
+        }
+        this.move_cursor([1, 0]);
     }
 
     find_all_occurence_of_input(input) {
