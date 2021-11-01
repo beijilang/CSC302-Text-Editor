@@ -1,7 +1,8 @@
-import { create_Command } from "./util.js";
-import termKit from "terminal-kit";
 import * as fs from "fs";
+import clipboard from "clipboardy";
+import termKit from "terminal-kit";
 import { SnapShotLinkedListNode, TextEditorStateManagementLinkList } from "./ObjectState.js";
+import { create_Command } from "./util.js";
 
 class TextEditor {
     constructor(input_parameter = {}) {
@@ -89,7 +90,7 @@ class TextEditor {
     }
 
     drawBar(pos, message) {
-        this.term.moveTo(pos.x, pos.y).green(" " + message);
+        this.term.moveTo(pos.x, pos.y).green(message);
     }
 
     drawRedBar(pos, message) {
@@ -159,6 +160,7 @@ class TextEditor {
             { key: "CTRL_Q", func: "SHOW_MAPPING" },
             { key: "SHIFT_LEFT", func: "HIGHLIGHT_LEFT" },
             { key: "SHIFT_RIGHT", func: "HIGHLIGHT_RIGHT" },
+            { key: "F2", func: "COPY" },
         ];
 
         try {
@@ -285,7 +287,7 @@ class TextEditor {
         if (!data.isCharacter) {
             name = this.customized_shortcut.get(name);
         }
-        if (name !== "HIGHLIGHT_LEFT" && name !== "HIGHLIGHT_RIGHT") {
+        if (!["HIGHLIGHT_LEFT", "HIGHLIGHT_RIGHT", "COPY"].includes(name)) {
             this.cancelHighlight();
         }
         switch (name) {
@@ -393,6 +395,9 @@ class TextEditor {
             case "HIGHLIGHT_RIGHT":
                 this.highlightRight();
                 break;
+            case "COPY":
+                this.copy();
+                break;
             default:
                 if (data.isCharacter) {
                     this.new_char(name);
@@ -436,6 +441,21 @@ class TextEditor {
             this.textBuffer.setAttrAt({ inverse: true }, this.textBuffer.cx, this.textBuffer.cy);
         }
         this.move_cursor([1, 0]);
+    }
+
+    copy() {
+        if (this.highlightRow === null) {
+            this.drawRedBar({ x: 1, y: 1}, "No selection.\n\n");
+        } else {
+            const selected = this.textBuffer.buffer[this.highlightRow].slice(this.highlightStart, this.highlightEnd + 1);
+            const payload = selected.map(c => c.char).join("");
+            clipboard.writeSync(payload);
+            this.drawBar({ x: 1, y: 1 }, "Copied.\n\n");
+        }
+        setTimeout(() => {
+            this.drawBar({ x: 1, y: 1 }, "Hit CTRL-C to quit.\n\n");
+            this.draw_cursor();
+        }, 3000);
     }
 
     find_all_occurence_of_input(input) {
