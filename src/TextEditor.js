@@ -46,6 +46,7 @@ class TextEditor {
         this.commandPrompt = false;
         this.displayMode = false;
         this.inputMode = "";
+        this.original_cursor_pos = [0,0]
         // We use this variable to check if we are trying to find and replace
         this.find_and_replace_related = {
             all_occurence_index: [],
@@ -58,6 +59,9 @@ class TextEditor {
         this.highlightRow = null;
         this.highlightStart = null;
         this.highlightEnd = null;
+
+        this.repeat_keys = []
+        this.repeat_times = 0
     }
 
     display_no_match_found_message_at_top() {
@@ -228,6 +232,12 @@ class TextEditor {
             return;
         }
 
+        if(key === "CTRL_C" || func === "TERMINATE"){
+            const text = "TERMINATE can not be altered\n";
+            this.set_display_mode(text);
+            return;
+        }
+
         for (var i = 0; i < this.shortcuts.length; ++i) {
             if (this.shortcuts[i].key === key) {
                 this.shortcuts[i].key = undefined;
@@ -277,13 +287,35 @@ class TextEditor {
 
         if (this.inputMode === "update_shortcut") {
             if (!data.isCharacter) {
-                this.set_shortcut(name, this.updateFunction);
                 this.textBuffer.setText(this.tmpTextBuffer.getText());
                 this.inputMode = "";
                 this.draw_cursor();
+                this.set_shortcut(name, this.updateFunction);
+                
+                return;
+            }
+            return
+        }
+
+        if (this.inputMode === "repeat") {
+            if(name === "CTRL_C"){
+                this.textBuffer.setText(this.tmpTextBuffer.getText());
+                this.inputMode = "";
+                this.textBuffer.cx = this.original_cursor_pos[0]
+                this.textBuffer.cy = this.original_cursor_pos[1]
+                this.draw_cursor();
+                this.repeat();
+                return;
+            }
+            else{
+                
+                this.textBuffer.insert(name);
+                this.draw_cursor();
+                this.repeat_keys.push([name, data]);
                 return;
             }
         }
+
         if (!data.isCharacter) {
             name = this.customized_shortcut.get(name);
         }
@@ -481,17 +513,21 @@ class TextEditor {
     }
 
     set_input_mode(text, mode) {
+        this.original_cursor_pos = [this.textBuffer.cx, this.textBuffer.cy]
         this.tmpTextBuffer.setText(this.textBuffer.getText());
 
         this.textBuffer.setText(text);
+        
         this.inputMode = mode;
+        this.textBuffer.moveTo(0, 1);
+       
+        
         this.draw_cursor();
     }
 
     set_display_mode(text) {
         text += "Press any key to return";
         this.tmpTextBuffer.setText(this.textBuffer.getText());
-
         this.textBuffer.setText(text);
         this.displayMode = true;
         this.draw_cursor();
@@ -604,6 +640,27 @@ class TextEditor {
         this.draw_cursor();
     }
 
+    sleep(milliseconds) {
+        const date = Date.now();
+        let currentDate = null;
+        do {
+          currentDate = Date.now();
+        } while (currentDate - date < milliseconds);
+      }
+
+    repeat(){
+        
+        for(let i = 0; i < this.repeat_times; i++){
+            for(let j = 0; j < this.repeat_keys.length; j++){
+
+                this.handle_key_press_event(this.repeat_keys[j][0], this.repeat_keys[j][1])
+                this.sleep(100);
+            }
+            
+        }
+        
+    }
+
     execute_command(input) {
         if (input != null) {
             input = input.substring(1);
@@ -631,6 +688,15 @@ class TextEditor {
                 }
             } else if (command == "reset_shortcuts") {
                 this.reset_shortcuts();
+            } else if (command == "repeat"){
+                if(args.length > 1){
+                    // const actions = args[1];
+                    this.repeat_keys = []
+                    this.repeat_times = args[1];
+                    this.set_input_mode("Press any key you want to repeat", "repeat");
+                    
+                }
+
             }
         }
     }
