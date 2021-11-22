@@ -21,6 +21,33 @@ class EnterCommand {
     }
 }
 
+class RecordCommand {
+    constructor(x, y, record_key_stroke) {
+        this.record_key_stroke = record_key_stroke
+        this.backdelete_length = record_key_stroke.length
+    }
+
+    input_series(TextEditorObj) {
+        for(let j = 0; j < this.record_key_stroke.length; j++){
+            TextEditorObj.handle_key_press_event(this.record_key_stroke[j][0], this.record_key_stroke[j][1])
+        }
+    }
+
+    execute(TextEditorObj) {
+        this.input_series(TextEditorObj)
+        this.undo_x = TextEditorObj.textBuffer.cx;
+        this.undo_y = TextEditorObj.textBuffer.cy;
+        TextEditorObj.draw_cursor();
+    }
+
+    redo(TextEditorObj) {
+        TextEditorObj.textBuffer.backDelete(this.backdelete_length);
+        this.x = TextEditorObj.textBuffer.cx;
+        this.y = TextEditorObj.textBuffer.cy;
+        TextEditorObj.draw_cursor();
+    }
+}
+
 class TabCommand {
     constructor(x, y, c_type) {
         this.x = x;
@@ -89,4 +116,4 @@ class DeleteCommand {
 }
 
 // Call export here
-export { DeleteCommand, TextCommand, EnterCommand, TabCommand };
+export { DeleteCommand, TextCommand, EnterCommand, TabCommand, RecordCommand};

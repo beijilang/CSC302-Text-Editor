@@ -1,4 +1,4 @@
-import { DeleteCommand, TextCommand, EnterCommand, TabCommand } from "./commandPattern.js";
+import { DeleteCommand, TextCommand, EnterCommand, TabCommand, RecordCommand } from "./commandPattern.js";
 
 export function create_Command(command_obj) {
     if (command_obj.command_type == "text") {
@@ -12,6 +12,9 @@ export function create_Command(command_obj) {
     }
     if (command_obj.command_type == "delete") {
         return new DeleteCommand(command_obj.x, command_obj.y, command_obj.command_type);
+    }
+    if (command_obj.command_type == "record") {
+        return new RecordCommand(command_obj.x, command_obj.y, command_obj.data)
     }
 }
 

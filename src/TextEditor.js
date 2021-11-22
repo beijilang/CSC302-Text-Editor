@@ -27,7 +27,8 @@ class TextEditor {
             "LEFT",
             "SHOW_MAPPING",
             "HIGHLIGHT_LEFT",
-            "HIGHLIGHT_RIGHT"
+            "HIGHLIGHT_RIGHT",
+            "ACTIVATE_RECORD"
         ];
 
         this.screenBuffer = new termKit.ScreenBuffer({
@@ -62,6 +63,9 @@ class TextEditor {
 
         this.repeat_keys = []
         this.repeat_times = 0
+        this.record_index = 0
+        this.record_key_stroke = []
+        this.record_index_to_content_map = {}
     }
 
     display_no_match_found_message_at_top() {
@@ -71,6 +75,24 @@ class TextEditor {
             this.drawBar({ x: 1, y: 1 }, "Hit CTRL-C to quit.\n\n");
             this.draw_cursor();
         }, 3000);
+    }
+    
+    log_record_key_doesnt_exist() {
+        this.drawRedBar({ x: 1, y: 1 }, "Invalid Record Key!!");
+        this.draw_cursor();
+        setTimeout(() => {
+            this.drawBar({ x: 1, y: 1 }, "Hit CTRL-C to quit.\n\n");
+            this.draw_cursor();
+        }, 5000);
+    }
+
+    log_invalid_key() {
+        this.drawRedBar({ x: 1, y: 1 }, "Invalid key detected");
+        this.draw_cursor();
+        setTimeout(() => {
+            this.drawBar({ x: 1, y: 1 }, "Hit CTRL-C to quit.\n\n");
+            this.draw_cursor();
+        }, 1000);  
     }
 
     onResize(width, height) {
@@ -94,7 +116,9 @@ class TextEditor {
     }
 
     drawBar(pos, message) {
-        this.term.moveTo(pos.x, pos.y).green(message);
+        this.term.moveTo(pos.x, pos.y)
+        this.term.eraseLine()
+        this.term.green(message);
     }
 
     drawRedBar(pos, message) {
@@ -147,6 +171,7 @@ class TextEditor {
         this.default_mapping = [
             { key: "CTRL_Z", func: "UNDO" },
             { key: "CTRL_F", func: "FIND_AND_REPLACE" },
+            { key : "CTRL_G", func: "ACTIVATE_RECORD"},
             { key: "CTRL_S", func: "SAVE" },
             { key: "CTRL_C", func: "TERMINATE" },
             { key: "CTRL_Y", func: "REDO" },
@@ -308,10 +333,29 @@ class TextEditor {
                 return;
             }
             else{
-                
                 this.textBuffer.insert(name);
                 this.draw_cursor();
                 this.repeat_keys.push([name, data]);
+                return;
+            }
+        }
+
+        if (this.inputMode == "record") {
+            if(name === "CTRL_C"){
+                this.textBuffer.setText(this.tmpTextBuffer.getText());
+                this.record_index_to_content_map[this.record_index] = this.record_key_stroke
+                this.inputMode = "";
+                this.record_key_stroke = []
+                this.record_index = ""
+                this.textBuffer.cx = this.original_cursor_pos[0]
+                this.textBuffer.cy = this.original_cursor_pos[1]
+                this.draw_cursor();
+                return;
+            }
+            else{
+                this.textBuffer.insert(name);
+                this.draw_cursor();
+                this.record_key_stroke.push([name, data]);
                 return;
             }
         }
@@ -338,7 +382,7 @@ class TextEditor {
                 });
                 break;
             case "FIND_AND_REPLACE":
-                this.prompt;
+
                 this.draw_command_prompt("Find:", (input) => {
                     if (typeof input !== "undefined") {
                         this.find_all_occurence_of_input(input);
@@ -353,6 +397,22 @@ class TextEditor {
                     }
                 });
                 break;
+            case "ACTIVATE_RECORD":
+                this.draw_command_prompt("Enter the key of the recording:", (input) => {
+                    if (typeof input !== "undefined") {
+                        let record_ind = input.replace("Enter the key of the recording:", "")
+                        if (!(record_ind in this.record_index_to_content_map)) {
+                            // Log that the key doesn't exist
+                            this.log_record_key_doesnt_exist()
+                        }
+                        else {
+                            // Create a Record Command, so we can undo it later
+                            this.record(record_ind)
+                        }
+                    }
+                });
+                break;
+
             case "COMMAND":
                 this.draw_command_prompt(":", (input) => {
                     this.execute_command(input);
@@ -512,14 +572,14 @@ class TextEditor {
         this.find_and_replace_related.all_occurence_index = all_occurence_index;
     }
 
-    set_input_mode(text, mode) {
+    set_input_mode(text, mode, line_start_index = 1) {
         this.original_cursor_pos = [this.textBuffer.cx, this.textBuffer.cy]
         this.tmpTextBuffer.setText(this.textBuffer.getText());
 
         this.textBuffer.setText(text);
         
         this.inputMode = mode;
-        this.textBuffer.moveTo(0, 1);
+        this.textBuffer.moveTo(0, line_start_index);
        
         
         this.draw_cursor();
@@ -618,6 +678,12 @@ class TextEditor {
         this.insert_and_execute(node);
     }
 
+    record(record_index) {
+        const record_command = create_Command({ command_type: "record", x: this.textBuffer.cx, y: this.textBuffer.cy, data: this.record_index_to_content_map[record_index]});
+        const node = new SnapShotLinkedListNode(record_command);
+        this.insert_and_execute(node);
+    }
+
     enter() {
         const appendCommand = create_Command({ command_type: "enter", x: this.textBuffer.cx, y: this.textBuffer.cy });
         const node = new SnapShotLinkedListNode(appendCommand);
@@ -649,12 +715,12 @@ class TextEditor {
       }
 
     repeat(){
-        
+
         for(let i = 0; i < this.repeat_times; i++){
             for(let j = 0; j < this.repeat_keys.length; j++){
 
                 this.handle_key_press_event(this.repeat_keys[j][0], this.repeat_keys[j][1])
-                this.sleep(100);
+                this.sleep(20);
             }
             
         }
@@ -693,10 +759,15 @@ class TextEditor {
                     // const actions = args[1];
                     this.repeat_keys = []
                     this.repeat_times = args[1];
-                    this.set_input_mode("Press any key you want to repeat", "repeat");
-                    
+                    this.set_input_mode("Press key you want to repeat and use CTRL + C to exit", "repeat");
                 }
 
+            }
+            else if (command == "record") {
+                let record_index = args[1]
+                this.record_index = record_index
+                let cmd_prompt = "Recording in Progress! You can now record a series of key strokes, this key stroke will have index " + String(record_index) + ".\n" + "You can later press CTRL + M and input this number to activate it."
+                this.set_input_mode(cmd_prompt, "record", 2)
             }
         }
     }
