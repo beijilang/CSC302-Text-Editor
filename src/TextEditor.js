@@ -114,11 +114,11 @@ class TextEditor {
         let new_buffer_x = this.textBuffer.x;
 		let new_buffer_y = this.textBuffer.y;
 
-		if (this.textBuffer.x < -this.textBuffer.cx) {
-			new_buffer_x = Math.min(0, -this.textBuffer.cx + Math.floor(this.screenBuffer.width / 2));
-		} else if (this.textBuffer.x > -this.textBuffer.cx + this.screenBuffer.width - 1) {
-			new_buffer_x = (this.screenBuffer.width / 2) - this.textBuffer.cx;
-		}
+		// if (this.textBuffer.x < -this.textBuffer.cx) {
+		// 	new_buffer_x = Math.min(0, -this.textBuffer.cx + Math.floor(this.screenBuffer.width / 2));
+		// } else if (this.textBuffer.x > -this.textBuffer.cx + this.screenBuffer.width - 1) {
+		// 	new_buffer_x = (this.screenBuffer.width / 2) - this.textBuffer.cx;
+		// }
 
 		if (this.textBuffer.y < -this.textBuffer.cy) {
 			new_buffer_y = Math.min(0, -this.textBuffer.cy + Math.floor(this.screenBuffer.height / 2));
@@ -134,9 +134,39 @@ class TextEditor {
 				delta: true
 			});
 		}
-
+        let text = this.getTextAtPos(this.textBuffer.cx, this.textBuffer.cy)
+        if(text != ""){
+            if(text == "("){
+                
+            }
+        }
 		this.textBuffer.drawCursor();
 		this.screenBuffer.drawCursor();
+    }
+
+    getTextAtPos(x, y){
+        let text = this.textBuffer.getText();
+        let text_lines = text.split(/\r?\n/);
+        let i = 0;
+        while(i < text_lines.length){
+            if(text_lines[i].length > this.term.width){
+                let tmp = text_lines[i];
+                text_lines[i] = text_lines[i].slice(0, this.term.width);
+                tmp = tmp.slice(this.term.width, tmp.length);
+                text_lines.splice(i+1, 0, tmp)
+            }
+            i+=1;
+        }
+        if( y < text_lines.length){
+            let text_segment = text_lines[y];
+            let char = text_segment.charAt(x);
+            return char
+        }
+        else{
+            return ""
+        }
+
+        
     }
 
     drawBar(pos, message) {
