@@ -134,12 +134,6 @@ class TextEditor {
 				delta: true
 			});
 		}
-        let text = this.getTextAtPos(this.textBuffer.cx, this.textBuffer.cy)
-        if(text != ""){
-            if(text == "("){
-                
-            }
-        }
 		this.textBuffer.drawCursor();
 		this.screenBuffer.drawCursor();
     }
