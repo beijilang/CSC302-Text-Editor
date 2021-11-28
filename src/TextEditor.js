@@ -1,8 +1,16 @@
 import * as fs from "fs";
+import * as util from "util"
 import clipboard from "clipboardy";
 import termKit from "terminal-kit";
 import { SnapShotLinkedListNode, TextEditorStateManagementLinkList } from "./ObjectState.js";
 import { create_Command } from "./util.js";
+
+var log_file = fs.createWriteStream('./debug.log', {flags : 'w'});
+var log_stdout = process.stdout;
+
+console.log = function(d) {
+  log_file.write(util.format(d) + '\n');
+};
 
 class TextEditor {
     constructor(input_parameter = {}) {
@@ -107,6 +115,21 @@ class TextEditor {
     }
 
     draw_cursor() {
+        this.textBuffer.setAttrRegion({ underline: false });
+        let text = this.getTextAtPos(this.textBuffer.cx, this.textBuffer.cy)
+        if(text != ""){
+            let location;
+            if(text == "("){
+                location = this.findClosingParenthesesFromLocation(this.textBuffer.cx, this.textBuffer.cy, true)
+            }
+            else if(text == ")"){
+                location = this.findClosingParenthesesFromLocation(this.textBuffer.cx, this.textBuffer.cy, false)
+            }
+            if(location != undefined){
+                this.textBuffer.setAttrAt({underline: true}, location.x, location.y);
+            }
+            
+        }
         this.textBuffer.draw();
         this.screenBuffer.draw({
             delta: true,
@@ -134,17 +157,66 @@ class TextEditor {
 				delta: true
 			});
 		}
-        let text = this.getTextAtPos(this.textBuffer.cx, this.textBuffer.cy)
-        if(text != ""){
-            if(text == "("){
-                
-            }
-        }
+
+        
 		this.textBuffer.drawCursor();
 		this.screenBuffer.drawCursor();
     }
 
-    getTextAtPos(x, y){
+    findClosingParenthesesFromLocation(x,y,open){
+        let text_lines = this.getTextSeperatedByLines();
+        let start;
+        let open_count = 0;
+        let close_count = 0;
+        if(open){
+            open_count += 1;
+            start = x+1
+        }
+        else{
+            close_count += 1;
+            start = x-1
+        }
+        if(y < text_lines.length){
+            if(open){
+                for(let i = y; i < text_lines.length; i++){
+                    for(let j = start; j < text_lines[i].length; j++){
+                        if(text_lines[i].charAt(j) == ")"){
+                            close_count += 1;
+                        }
+                        else if(text_lines[i].charAt(j) == "("){
+                            open_count += 1;
+                        }
+                        if(close_count == open_count){
+                            return {x:j, y:i}
+                        }
+                    }
+                    start = 0;
+                }
+            }
+            else{
+                for(let i = y; i >=0; i--){
+                    for(let j = start; j >= 0; j--){
+                        if(text_lines[i].charAt(j) == ")"){
+                            close_count += 1;
+                        }
+                        else if(text_lines[i].charAt(j) == "("){
+                            open_count += 1;
+                        }
+                        if(close_count == open_count){
+                            return {x:j, y:i}
+                        }
+                        
+                    }
+                    if(i > 0){
+                        start = text_lines[i-1].length;
+                    }
+                }                
+            }
+
+        }
+        
+    }
+    getTextSeperatedByLines(){
         let text = this.textBuffer.getText();
         let text_lines = text.split(/\r?\n/);
         let i = 0;
@@ -157,6 +229,10 @@ class TextEditor {
             }
             i+=1;
         }
+        return text_lines;
+    }
+    getTextAtPos(x, y){
+        let text_lines = this.getTextSeperatedByLines();
         if( y < text_lines.length){
             let text_segment = text_lines[y];
             let char = text_segment.charAt(x);
