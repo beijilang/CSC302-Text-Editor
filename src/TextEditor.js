@@ -591,16 +591,34 @@ class TextEditor {
                 break;
             case "LEFT":
                 if (this.textBuffer.cy == 0 && this.textBuffer.cx == 0) {
-                } else {
+                } 
+                else if (this.textBuffer.cx == 0) {
+                    this.textBuffer.moveTo(this.textBuffer.buffer[this.textBuffer.cy - 1].length - 1, this.textBuffer.cy - 1);
+                    this.draw_cursor();
+                }
+                else {
                     this.move_cursor([-1, 0]);
                 }
                 break;
             case "RIGHT":
+                this.write_to_log(String(this.textBuffer.cy) + "," + String(this.textBuffer.buffer.length) + "\n");
+
+                if (this.textBuffer.cy >= this.textBuffer.buffer.length) {
+                    return
+                }
+
+
                 if (
-                    this.textBuffer.cy == this.textBuffer.buffer.length - 1 &&
-                    this.textBuffer.cx == this.textBuffer.buffer[this.textBuffer.buffer.length - 1].length
-                ) {
-                } else {
+                    this.textBuffer.cy >= this.textBuffer.buffer.length - 1 &&
+                    this.textBuffer.cx >= this.textBuffer.buffer[this.textBuffer.buffer.length - 1].length
+                    ) 
+                {
+                } 
+                else if (this.textBuffer.cx == this.textBuffer.buffer[this.textBuffer.cy].length) {
+                    this.textBuffer.moveTo(0, this.textBuffer.cy + 1);
+                    this.draw_cursor();
+                }
+                else {
                     this.move_cursor([1, 0]);
                 }
                 break;
