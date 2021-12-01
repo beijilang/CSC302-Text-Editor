@@ -6,7 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src",
-    "test": "node test/test.js",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
     "fix-lint": "eslint --fix src test",
     "lint": "eslint src test",
     "format": "prettier --write src test",
@@ -23,7 +23,15 @@
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.1",
+    "jest": "^27.4.2",
     "prettier": "2.4.1"
+  },
+  "jest": {
+    "clearMocks": true,
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "coverageProvider": "v8",
+    "transform": {}
   },
   "eslintConfig": {
     "root": true,
