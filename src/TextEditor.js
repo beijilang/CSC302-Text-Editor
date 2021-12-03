@@ -120,10 +120,22 @@ class TextEditor {
         if(text != ""){
             let location;
             if(text == "("){
-                location = this.findClosingParenthesesFromLocation(this.textBuffer.cx, this.textBuffer.cy, true)
+                location = this.findClosingParenthesesFromLocation(this.textBuffer.cx, this.textBuffer.cy, true, text)
             }
             else if(text == ")"){
-                location = this.findClosingParenthesesFromLocation(this.textBuffer.cx, this.textBuffer.cy, false)
+                location = this.findClosingParenthesesFromLocation(this.textBuffer.cx, this.textBuffer.cy, false, text)
+            }
+            if(text == "["){
+                location = this.findClosingParenthesesFromLocation(this.textBuffer.cx, this.textBuffer.cy, true, text)
+            }
+            else if(text == "]"){
+                location = this.findClosingParenthesesFromLocation(this.textBuffer.cx, this.textBuffer.cy, false, text)
+            }
+            else if(text == "{"){
+                location = this.findClosingParenthesesFromLocation(this.textBuffer.cx, this.textBuffer.cy, true, text)
+            }
+            else if(text == "}"){
+                location = this.findClosingParenthesesFromLocation(this.textBuffer.cx, this.textBuffer.cy, false, text)
             }
             if(location != undefined){
                 this.textBuffer.setAttrAt({underline: true}, location.x, location.y);
@@ -165,7 +177,7 @@ class TextEditor {
 		this.screenBuffer.drawCursor();
     }
 
-    findClosingParenthesesFromLocation(x,y,open){
+    findClosingParenthesesFromLocation(x,y,open, text){
         let text_lines = this.getTextSeperatedByLines();
         let start;
         let open_count = 0;
@@ -182,11 +194,29 @@ class TextEditor {
             if(open){
                 for(let i = y; i < text_lines.length; i++){
                     for(let j = start; j < text_lines[i].length; j++){
-                        if(text_lines[i].charAt(j) == ")"){
-                            close_count += 1;
+                        if(text == "("){
+                            if(text_lines[i].charAt(j) == ")"){
+                                close_count += 1;
+                            }
+                            else if(text_lines[i].charAt(j) == "("){
+                                open_count += 1;
+                            }
                         }
-                        else if(text_lines[i].charAt(j) == "("){
-                            open_count += 1;
+                        else if(text == "["){
+                            if(text_lines[i].charAt(j) == "]"){
+                                close_count += 1;
+                            }
+                            else if(text_lines[i].charAt(j) == "["){
+                                open_count += 1;
+                            }
+                        }
+                        else if(text == "{"){
+                            if(text_lines[i].charAt(j) == "}"){
+                                close_count += 1;
+                            }
+                            else if(text_lines[i].charAt(j) == "{"){
+                                open_count += 1;
+                            }
                         }
                         if(close_count == open_count){
                             return {x:j, y:i}
@@ -198,11 +228,29 @@ class TextEditor {
             else{
                 for(let i = y; i >=0; i--){
                     for(let j = start; j >= 0; j--){
-                        if(text_lines[i].charAt(j) == ")"){
-                            close_count += 1;
+                        if(text == ")"){
+                            if(text_lines[i].charAt(j) == ")"){
+                                close_count += 1;
+                            }
+                            else if(text_lines[i].charAt(j) == "("){
+                                open_count += 1;
+                            }
                         }
-                        else if(text_lines[i].charAt(j) == "("){
-                            open_count += 1;
+                        else if(text == "]"){
+                            if(text_lines[i].charAt(j) == "]"){
+                                close_count += 1;
+                            }
+                            else if(text_lines[i].charAt(j) == "["){
+                                open_count += 1;
+                            }
+                        }
+                        else if(text == "}"){
+                            if(text_lines[i].charAt(j) == "}"){
+                                close_count += 1;
+                            }
+                            else if(text_lines[i].charAt(j) == "{"){
+                                open_count += 1;
+                            }
                         }
                         if(close_count == open_count){
                             return {x:j, y:i}
@@ -265,7 +313,6 @@ class TextEditor {
             cancelable: true,
             x: 0,
             y: this.term.height,
-            default: defaultString,
             cancelable: true,
         };
         this.term.inputField(inputParameters, (error, input) => {
@@ -360,8 +407,7 @@ class TextEditor {
                 this.TextEditorStateManagementLinkList = new TextEditorStateManagementLinkList(init_state, this);
                 this.filePath = file;
             } catch (e) {
-                // TODO: Add error check
-                // this.term.red("something went wrong");
+                this.write_to_log("Error when opening file")
             }
         }
     }
@@ -377,8 +423,7 @@ class TextEditor {
         try {
             fs.writeFileSync(this.filePath, this.textBuffer.getText());
         } catch (e) {
-            // TODO:: Add error check
-            // this.term.red("Something went wrong");
+            this.write_to_log("Error when saving file")
         }
     }
 
@@ -603,8 +648,6 @@ class TextEditor {
                 }
                 break;
             case "RIGHT":
-                this.write_to_log(String(this.textBuffer.cy) + "," + String(this.textBuffer.buffer.length) + "\n");
-
                 if (this.textBuffer.cy >= this.textBuffer.buffer.length) {
                     return
                 }
@@ -879,8 +922,6 @@ class TextEditor {
 
     execute_command(input) {
         if (input != null) {
-            input = input.substring(1);
-
             const args = input.split(" ");
             const command = args[0];
             if (command == "open") {
