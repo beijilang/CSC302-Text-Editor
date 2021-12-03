@@ -63,10 +63,10 @@ Adding advanced feature:
 
 Team member's responsibilities:
 
-* Yujie
-* Tony
-* David
-* Kevin
+* Yujie - Repeat operation
+* Tony - Record and Repeat keystroke
+* David - Find matching parentheses
+* Kevin - General Testing
 
 ## Milestone 4
 
