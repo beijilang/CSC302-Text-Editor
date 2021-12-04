@@ -80,7 +80,9 @@ npm test
   - User can save an existing file by pressing CTRL + S or entering "save" in command mode
   - User can save a new file by pressing CTRL + A or entering "save {file_name}" in command mode
 
-- Recording (Tony)
+- Recording
+  - Users can enter "record {any integer}" in command mode to record an input. For example, Users can enter record 1 to store input to the number 1
+  - Later, user can press CTRL + G and type in the number 1 to reenter this command.
 
 - Update shortcut
 
