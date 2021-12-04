@@ -958,7 +958,7 @@ class TextEditor {
             else if (command == "record") {
                 let record_index = args[1]
                 this.record_index = record_index
-                let cmd_prompt = "Recording in Progress! You can now record a series of key strokes, this key stroke will have index " + String(record_index) + ".\n" + "You can later press CTRL + M and input this number to activate it."
+                let cmd_prompt = "Recording in Progress! You can now record a series of key strokes, this key stroke will have index " + String(record_index) + ".\n" + "You can later press CTRL + G and input this number to activate it."
                 this.set_input_mode(cmd_prompt, "record", 2)
             }
         }
