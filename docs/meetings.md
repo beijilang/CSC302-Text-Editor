@@ -117,6 +117,7 @@ There are 3 new features we need to work on, and someone need to write the test 
   - Yujie finished repeat
   - Wenshuo was still working on his part
   - Lantao started to work on record, and found some bugs related to missing cursor.
+- Lantao encountered an unexpected techinical difficulty when implementing replace. Inserting text into an existing text buffer at a given location is very difficult (terminal-kit's text buffer is not designed to handle case like this). After some discussion, we decide to give up on this feature, and use the time to make sure our application is bug free.
 
 ## Nov 25
 
@@ -128,3 +129,29 @@ There are 3 new features we need to work on, and someone need to write the test 
 - Clarified some questions related to the final presentation and interview.
   - When is the final presentation/interview (Dec 6)
   - What the presentation/interview are about (just to make sure each team member contribute the the project)
+
+## Nov 28
+
+- Group member meeting
+- Sync up all the development work before a3 is due.
+  - Wenshuo finished parentheses highlight, but discovered several bugs related to the cursor, which Lantao and Yujie will fix in the next few days.
+    - Cursor will not move to a new line when adding more text at the end of a line (fixed)
+    - At the end/begining of a line, cursor should move down/up when pressing right/left (fixed)
+  - Lantao and Yujie has been actively testing the application to make sure all features work as intended.
+- Looked back at our milestone and went over which feature has been implemented, and which haven't
+  - We completed most of the features listed in our milestone, which includes:
+    - Render text
+    - Cursor movement
+    - Find
+    - open/close file
+    - save/save as
+    - vim style command prompt
+    - copy/paste
+    - Record and Repeat keystroke
+    - Repeat operation
+    - Find matching parentheses
+  - There are only a few basic features we haven't implmenet, which are:
+    - replace (This feature is extremely difficult to implement due to the terminal-kit's text buffer design. After a in-team discussion, we decide to move on with other features)
+    - Show line numbers (This will drasticallly change the logic for finding the parentheses due to the change in screen buffer)
+  - In conclusion, we implemented most of the basic features we listed in our milestone. Most of the features we didn't implement are "add-on" features - our plan is to implement them after the main features are done. The only exception is replace, which we encounter unexpected difficulty when implementing it.
+- Celebrate on our project's completion :)
