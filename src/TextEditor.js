@@ -84,7 +84,7 @@ class TextEditor {
             this.draw_cursor();
         }, 3000);
     }
-    
+
     log_record_key_doesnt_exist() {
         this.drawRedBar({ x: 1, y: 1 }, "Invalid Record Key!!");
         this.draw_cursor();
@@ -100,7 +100,7 @@ class TextEditor {
         setTimeout(() => {
             this.drawBar({ x: 1, y: 1 }, "Hit CTRL-C to quit.\n\n");
             this.draw_cursor();
-        }, 1000);  
+        }, 1000);
     }
 
     onResize(width, height) {
@@ -140,7 +140,7 @@ class TextEditor {
             if(location != undefined){
                 this.textBuffer.setAttrAt({underline: true}, location.x, location.y);
             }
-            
+
         }
         this.textBuffer.draw();
         this.screenBuffer.draw({
@@ -150,7 +150,7 @@ class TextEditor {
 		let new_buffer_y = this.textBuffer.y;
 
 		if (this.textBuffer.x < -this.textBuffer.cx) {
-            
+
 			new_buffer_x = Math.min(0, -this.textBuffer.cx + Math.floor(this.screenBuffer.width / 2));
 		} else if (this.textBuffer.x > -this.textBuffer.cx + this.screenBuffer.width) {
 			this.textBuffer.cx = 0;
@@ -172,7 +172,7 @@ class TextEditor {
 			});
 		}
 
-        
+
 		this.textBuffer.drawCursor();
 		this.screenBuffer.drawCursor();
     }
@@ -255,16 +255,16 @@ class TextEditor {
                         if(close_count == open_count){
                             return {x:j, y:i}
                         }
-                        
+
                     }
                     if(i > 0){
                         start = text_lines[i-1].length;
                     }
-                }                
+                }
             }
 
         }
-        
+
     }
     getTextSeperatedByLines(){
         let text = this.textBuffer.getText();
@@ -292,7 +292,7 @@ class TextEditor {
             return ""
         }
 
-        
+
     }
 
     drawBar(pos, message) {
@@ -493,7 +493,7 @@ class TextEditor {
                 this.inputMode = "";
                 this.draw_cursor();
                 this.set_shortcut(name, this.updateFunction);
-                
+
                 return;
             }
             return
@@ -640,7 +640,7 @@ class TextEditor {
                 break;
             case "LEFT":
                 if (this.textBuffer.cy == 0 && this.textBuffer.cx == 0) {
-                } 
+                }
                 else if (this.textBuffer.cx == 0) {
                     this.textBuffer.moveTo(this.textBuffer.buffer[this.textBuffer.cy - 1].length - 1, this.textBuffer.cy - 1);
                     this.draw_cursor();
@@ -658,9 +658,9 @@ class TextEditor {
                 if (
                     this.textBuffer.cy >= this.textBuffer.buffer.length - 1 &&
                     this.textBuffer.cx >= this.textBuffer.buffer[this.textBuffer.buffer.length - 1].length
-                    ) 
+                    )
                 {
-                } 
+                }
                 else if (this.textBuffer.cx == this.textBuffer.buffer[this.textBuffer.cy].length) {
                     this.textBuffer.moveTo(0, this.textBuffer.cy + 1);
                     this.draw_cursor();
@@ -772,11 +772,11 @@ class TextEditor {
         this.tmpTextBuffer.setText(this.textBuffer.getText());
 
         this.textBuffer.setText(text);
-        
+
         this.inputMode = mode;
         this.textBuffer.moveTo(0, line_start_index);
-       
-        
+
+
         this.draw_cursor();
     }
 
@@ -917,9 +917,9 @@ class TextEditor {
                 this.handle_key_press_event(this.repeat_keys[j][0], this.repeat_keys[j][1])
                 this.sleep(20);
             }
-            
+
         }
-        
+
     }
     execute_command(input) {
         if (input != null) {
@@ -968,9 +968,6 @@ class TextEditor {
         this.term.clear();
         this.term.moveTo(0, 0);
         this.term.grabInput(false);
-        setTimeout(function () {
-            process.exit();
-        }, 100);
     }
 }
 
