@@ -554,8 +554,10 @@ class TextEditor {
                 break;
             case "SAVE_AS":
                 this.draw_command_prompt("Save File As:", (input) => {
-                    this.filePath = input.replace("Save File As:", "");
-                    this.save_file();
+                    if(input != undefined){
+                        this.filePath = input;
+                        this.save_file();
+                    }
                 });
                 break;
             case "FIND_AND_REPLACE":
@@ -919,7 +921,6 @@ class TextEditor {
         }
         
     }
-
     execute_command(input) {
         if (input != null) {
             const args = input.split(" ");
