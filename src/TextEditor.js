@@ -142,6 +142,9 @@ class TextEditor {
             }
             if(location != undefined){
                 this.textBuffer.setAttrAt({underline: true}, location.x, location.y);
+                if(this.highlightRow != null){
+                    this.textBuffer.setAttrRegion({inverse: true}, {xmin: this.highlightStart, xmax: this.highlightEnd, ymin: this.highlightRow, ymax: this.highlightRow})
+                }
             }
             
         }
@@ -369,7 +372,7 @@ class TextEditor {
             { key: "CTRL_Q", func: "SHOW_MAPPING" },
             { key: "SHIFT_LEFT", func: "HIGHLIGHT_LEFT" },
             { key: "SHIFT_RIGHT", func: "HIGHLIGHT_RIGHT" },
-            { key: "F2", func: "COPY" },
+            { key: "CTRL_B", func: "COPY" },
         ];
 
         try {
@@ -732,6 +735,7 @@ class TextEditor {
     }
 
     copy() {
+        console.log("im called")
         if (this.highlightRow === null) {
             this.drawRedBar({ x: 1, y: 1}, "No selection.\n\n");
         } else {
