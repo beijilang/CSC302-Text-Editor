@@ -552,8 +552,10 @@ class TextEditor {
                 break;
             case "SAVE_AS":
                 this.draw_command_prompt("Save File As:", (input) => {
-                    this.filePath = input.replace("Save File As:", "");
-                    this.save_file();
+                    if(input != undefined){
+                        this.filePath = input;
+                        this.save_file();
+                    }
                 });
                 break;
             case "FIND_AND_REPLACE":
@@ -917,7 +919,6 @@ class TextEditor {
         }
         
     }
-
     execute_command(input) {
         if (input != null) {
             const args = input.split(" ");
@@ -955,7 +956,7 @@ class TextEditor {
             else if (command == "record") {
                 let record_index = args[1]
                 this.record_index = record_index
-                let cmd_prompt = "Recording in Progress! You can now record a series of key strokes, this key stroke will have index " + String(record_index) + ".\n" + "You can later press CTRL + M and input this number to activate it."
+                let cmd_prompt = "Recording in Progress! You can now record a series of key strokes, this key stroke will have index " + String(record_index) + ".\n" + "You can later press CTRL + G and input this number to activate it."
                 this.set_input_mode(cmd_prompt, "record", 2)
             }
         }

@@ -150,7 +150,7 @@ There are 3 new features we need to work on, and someone need to write the test 
     - Record and Repeat keystroke
     - Repeat operation
     - Find matching parentheses
-  - There are only a few basic features we haven't implmenet, which are:
+  - There are only a few basic features we haven't implement, which are:
     - replace (This feature is extremely difficult to implement due to the terminal-kit's text buffer design. After a in-team discussion, we decide to move on with other features)
     - Show line numbers (This will drasticallly change the logic for finding the parentheses due to the change in screen buffer)
   - In conclusion, we implemented most of the basic features we listed in our milestone. Most of the features we didn't implement are "add-on" features - our plan is to implement them after the main features are done. The only exception is replace, which we encounter unexpected difficulty when implementing it.
