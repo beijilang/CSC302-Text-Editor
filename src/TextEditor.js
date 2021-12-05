@@ -116,6 +116,9 @@ class TextEditor {
 
     draw_cursor() {
         this.textBuffer.setAttrRegion({ underline: false });
+        if(this.highlightRow != null){
+            this.textBuffer.setAttrRegion({inverse: true}, {xmin: this.highlightStart, xmax: this.highlightEnd, ymin: this.highlightRow, ymax: this.highlightRow})
+        }
         let text = this.getTextAtPos(this.textBuffer.cx, this.textBuffer.cy)
         if(text != ""){
             let location;
