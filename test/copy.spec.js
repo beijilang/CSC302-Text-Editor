@@ -24,18 +24,36 @@ describe("Highlight and copy to clipboard (pseudo-TTY child process)", () => {
         process.kill();
     });
     test("example 1", async () => {
+        try {
+            clipboard.writeSync("");
+        } catch(error) {
+            console.warn("Skipping copy test", error);
+            return;
+        }
         expect.assertions(1);
         process.write(SHIFT_LEFT.repeat(13) + F2 + "\x03");
         await sleep(400);
         expect(clipboard.readSync()).toEqual("U of T CSC302");
     });
     test("example 2", async () => {
+        try {
+            clipboard.writeSync("");
+        } catch(error) {
+            console.warn("Skipping copy test", error);
+            return;
+        }
         expect.assertions(1);
         process.write(LEFT.repeat(6) + SHIFT_RIGHT.repeat(3) + F2 + "\x03");
         await sleep(400);
         expect(clipboard.readSync()).toEqual("CSC");
     });
     test("example 3", async () => {
+        try {
+            clipboard.writeSync("");
+        } catch(error) {
+            console.warn("Skipping copy test", error);
+            return;
+        }
         expect.assertions(1);
         process.write(LEFT.repeat(6) + SHIFT_RIGHT.repeat(3) + SHIFT_LEFT.repeat(4) + F2 + "\x03");
         await sleep(400);

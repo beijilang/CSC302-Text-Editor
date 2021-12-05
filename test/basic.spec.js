@@ -1,7 +1,7 @@
 import TextEditor from "../src/TextEditor.js";
 
 describe("Basic in-process tests", () => {
-    it.skip("constructs TextEditor and starts", () => {
+    it("constructs TextEditor and starts", () => {
         if (process.stdout.isTTY) {
             const editor = new TextEditor();
             editor.init("");
