@@ -6,7 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest --verbose",
     "fix-lint": "eslint --fix src test",
     "lint": "eslint src test",
     "format": "prettier --write src test",
@@ -24,6 +24,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.1",
     "jest": "^27.4.2",
+    "node-pty": "^0.10.1",
     "prettier": "2.4.1"
   },
   "jest": {
