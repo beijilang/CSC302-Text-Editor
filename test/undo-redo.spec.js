@@ -58,7 +58,7 @@ describe("Undo and redo (pseudo-TTY child process)", () => {
     beforeEach(async () => {
         fs.writeFileSync("undo.txt", "");
         process = pty.spawn("node", ["src", "undo.txt"]);
-        await sleep(400);
+        await sleep(500);
     });
     afterEach(() => {
         process.kill();
@@ -66,13 +66,13 @@ describe("Undo and redo (pseudo-TTY child process)", () => {
     test("example 1", async () => {
         expect.assertions(1);
         process.write("123456\x1A\x1A\x19\x13\x03"); // Ctrl+Z, Ctrl+Z, Ctrl+Y, Ctrl+S, Ctrl+C
-        await sleep(400);
+        await sleep(500);
         expect(result()).toEqual("12345");
     });
     test("example 2", async () => {
         expect.assertions(1);
         process.write("123456\x1A\x1A7\x1A\x19\x13\x03"); // Ctrl+Z, Ctrl+Z, 7, Ctrl+Z, Ctrl+Y, Ctrl+S, Ctrl+C
-        await sleep(400);
+        await sleep(500);
         expect(result()).toEqual("12347");
     });
 });
