@@ -735,7 +735,6 @@ class TextEditor {
     }
 
     copy() {
-        console.log("im called")
         if (this.highlightRow === null) {
             this.drawRedBar({ x: 1, y: 1}, "No selection.\n\n");
         } else {
