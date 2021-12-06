@@ -878,9 +878,14 @@ class TextEditor {
     }
 
     record(record_index) {
-        const record_command = create_Command({ command_type: "record", x: this.textBuffer.cx, y: this.textBuffer.cy, data: this.record_index_to_content_map[record_index]});
-        const node = new SnapShotLinkedListNode(record_command);
-        this.insert_and_execute(node);
+        // const record_command = create_Command({ command_type: "record", x: this.textBuffer.cx, y: this.textBuffer.cy, data: this.record_index_to_content_map[record_index]});
+        // const node = new SnapShotLinkedListNode(record_command);
+        // this.insert_and_execute(node);
+        let r_k = this.record_index_to_content_map[record_index];
+        for(let j = 0; j < r_k.length; j++){
+            this.handle_key_press_event(r_k[j][0], r_k[j][1])
+            this.sleep(20);
+        }
     }
 
     enter() {
