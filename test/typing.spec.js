@@ -34,7 +34,7 @@ describe("Opens and save a file (pseudo-TTY child process)", () => {
     });
     test("backspace", async () => {
         expect.assertions(1);
-        process.write("qwerti\by\x13\x03"); // qwerti, backspace, y Ctrl+S, Ctrl+C
+        process.write("qwerti\x08y\x13\x03"); // qwerti, backspace, y Ctrl+S, Ctrl+C
         await sleep(500);
         expect(result()).toEqual("qwerty");
     });
