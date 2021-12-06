@@ -372,7 +372,7 @@ class TextEditor {
             { key: "CTRL_Q", func: "SHOW_MAPPING" },
             { key: "SHIFT_LEFT", func: "HIGHLIGHT_LEFT" },
             { key: "SHIFT_RIGHT", func: "HIGHLIGHT_RIGHT" },
-            { key: "CTRL_B", func: "COPY" },
+            { key: "F2", func: "COPY" },
         ];
 
         try {
