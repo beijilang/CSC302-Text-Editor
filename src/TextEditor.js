@@ -116,6 +116,9 @@ class TextEditor {
 
     draw_cursor() {
         this.textBuffer.setAttrRegion({ underline: false });
+        if(this.highlightRow != null){
+            this.textBuffer.setAttrRegion({inverse: true}, {xmin: this.highlightStart, xmax: this.highlightEnd, ymin: this.highlightRow, ymax: this.highlightRow})
+        }
         let text = this.getTextAtPos(this.textBuffer.cx, this.textBuffer.cy)
         if(text != ""){
             let location;
@@ -139,6 +142,9 @@ class TextEditor {
             }
             if(location != undefined){
                 this.textBuffer.setAttrAt({underline: true}, location.x, location.y);
+                if(this.highlightRow != null){
+                    this.textBuffer.setAttrRegion({inverse: true}, {xmin: this.highlightStart, xmax: this.highlightEnd, ymin: this.highlightRow, ymax: this.highlightRow})
+                }
             }
 
         }
@@ -171,8 +177,6 @@ class TextEditor {
 				delta: true
 			});
 		}
-
-
 		this.textBuffer.drawCursor();
 		this.screenBuffer.drawCursor();
     }
@@ -368,7 +372,7 @@ class TextEditor {
             { key: "CTRL_Q", func: "SHOW_MAPPING" },
             { key: "SHIFT_LEFT", func: "HIGHLIGHT_LEFT" },
             { key: "SHIFT_RIGHT", func: "HIGHLIGHT_RIGHT" },
-            { key: "F2", func: "COPY" },
+            { key: "CTRL_B", func: "COPY" },
         ];
 
         try {
